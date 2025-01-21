@@ -1,4 +1,3 @@
-import 'package:freeflow/data/imeta.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
 import 'package:ndk/entities.dart';
@@ -13,21 +12,13 @@ class VideosAPINostr {
   }
 
   Future<void> load() async {
-    print("Loading videos");
+    if (this.listVideos.length != 0) {
+      return;
+    }
     final response = ndk.requests.query(filters: [
-      Filter(kinds: [34236])
+      Filter(kinds: [SHORT_KIND], limit: 20)
     ]);
-    this.listVideos = await response.stream
-        .asyncMap((e) => Video.new(
-            id: e.id,
-            user: e.pubKey,
-            userPic: "",
-            videoTitle: '',
-            songName: '',
-            likes: '',
-            comments: '',
-            metadata: IMeta.fromEvent(e)))
-        .toList();
-    print(this.listVideos);
+    this.listVideos =
+        await response.stream.asyncMap((e) => Video.fromEvent(e)).toList();
   }
 }

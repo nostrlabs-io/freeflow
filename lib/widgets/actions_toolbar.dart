@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:freeflow/utils/tik_tok_icons_icons.dart';
-import 'package:freeflow/widgets/circle_image_animation.dart';
+import 'package:ndk/ndk.dart';
 
 class ActionsToolbar extends StatelessWidget {
   // Full dimensions of an action
@@ -19,25 +19,22 @@ class ActionsToolbar extends StatelessWidget {
 // The size of the plus icon under the profile image in follow action
   static const double PlusIconSize = 20.0;
 
-  final String numLikes;
-  final String numComments;
-  final String userPic;
+  final int numLikes;
+  final int numComments;
+  final Metadata user;
 
-  ActionsToolbar(this.numLikes, this.numComments, this.userPic);
+  ActionsToolbar(this.numLikes, this.numComments, this.user);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 100.0,
+      width: ActionWidgetSize,
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        _getFollowAction(pictureUrl: userPic),
-        _getSocialAction(icon: TikTokIcons.heart, title: numLikes),
-        _getSocialAction(icon: TikTokIcons.chat_bubble, title: numComments),
+        _getFollowAction(user),
+        _getSocialAction(icon: TikTokIcons.heart, title: numLikes.toString()),
         _getSocialAction(
-            icon: TikTokIcons.reply, title: 'Share', isShare: true),
-        CircleImageAnimation(
-          child: _getMusicPlayerAction(userPic),
-        )
+            icon: TikTokIcons.chat_bubble, title: numComments.toString()),
+        _getSocialAction(icon: TikTokIcons.reply, title: 'Share', isShare: true)
       ]),
     );
   }
@@ -46,8 +43,7 @@ class ActionsToolbar extends StatelessWidget {
       {required String title, required IconData icon, bool isShare = false}) {
     return Container(
         margin: EdgeInsets.only(top: 15.0),
-        width: 60.0,
-        height: 60.0,
+        width: ActionWidgetSize,
         child: Column(children: [
           Icon(icon, size: isShare ? 25.0 : 35.0, color: Colors.grey[300]),
           Padding(
@@ -61,13 +57,15 @@ class ActionsToolbar extends StatelessWidget {
         ]));
   }
 
-  Widget _getFollowAction({required String pictureUrl}) {
+  Widget _getFollowAction(Metadata profile) {
     return Container(
         margin: EdgeInsets.symmetric(vertical: 10.0),
-        width: 60.0,
-        height: 60.0,
-        child:
-            Stack(children: [_getProfilePicture(pictureUrl), _getPlusIcon()]));
+        width: ActionWidgetSize,
+        height: ActionWidgetSize,
+        child: Stack(children: [
+          _getProfilePicture(profile),
+          _getPlusIcon()
+        ]));
   }
 
   Widget _getPlusIcon() {
@@ -88,7 +86,7 @@ class ActionsToolbar extends StatelessWidget {
     );
   }
 
-  Widget _getProfilePicture(userPic) {
+  Widget _getProfilePicture(Metadata profile) {
     return Positioned(
         left: (ActionWidgetSize / 2) - (ProfileImageSize / 2),
         child: Container(
@@ -103,7 +101,8 @@ class ActionsToolbar extends StatelessWidget {
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(10000.0),
                 child: CachedNetworkImage(
-                  imageUrl: userPic,
+                  imageUrl: profile.picture ??
+                      "https://nostr.api.v0l.io/api/v1/avatar/cyberpunks/${profile.pubKey}",
                   placeholder: (context, url) =>
                       new CircularProgressIndicator(),
                   errorWidget: (context, url, error) => new Icon(Icons.error),

@@ -19,3 +19,5 @@ final ndk = Ndk(
     cache: MemCacheManager(),
   ),
 );
+
+final SHORT_KIND = 34236;

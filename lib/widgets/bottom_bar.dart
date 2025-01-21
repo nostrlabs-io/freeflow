@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:freeflow/screens/feed_viewmodel.dart';
+import 'package:freeflow/view_model/feed_viewmodel.dart';
 import 'package:freeflow/utils/tik_tok_icons_icons.dart';
+import 'package:freeflow/view_model/router.dart';
 import 'package:get_it/get_it.dart';
 
 class BottomBar extends StatelessWidget {
@@ -32,13 +33,13 @@ class BottomBar extends StatelessWidget {
           height: double.infinity,
           width: CreateButtonWidth,
           decoration: BoxDecoration(
-              color: GetIt.instance<FeedViewModel>().actualScreen == 0
+              color: GetIt.instance<RouterThing>().route == 0
                   ? Colors.white
                   : Colors.black,
               borderRadius: BorderRadius.circular(7.0)),
           child: Icon(
             Icons.add,
-            color: GetIt.instance<FeedViewModel>().actualScreen == 0
+            color: GetIt.instance<RouterThing>().route == 0
                 ? Colors.black
                 : Colors.white,
             size: 20.0,
@@ -83,7 +84,7 @@ class BottomBar extends StatelessWidget {
   Widget menuButton(String text, IconData icon, int index) {
     return GestureDetector(
         onTap: () {
-          GetIt.instance<FeedViewModel>().setActualScreen(index);
+          GetIt.instance<RouterThing>().setRoute(index);
         },
         child: Container(
           height: 45,
@@ -92,11 +93,11 @@ class BottomBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Icon(icon,
-                  color: GetIt.instance<FeedViewModel>().actualScreen == 0
-                      ? GetIt.instance<FeedViewModel>().actualScreen == index
+                  color: GetIt.instance<RouterThing>().route == 0
+                      ? GetIt.instance<RouterThing>().route == index
                           ? Colors.white
                           : Colors.white70
-                      : GetIt.instance<FeedViewModel>().actualScreen == index
+                      : GetIt.instance<RouterThing>().route == index
                           ? Colors.black
                           : Colors.black54,
                   size: NavigationIconSize),
@@ -106,15 +107,14 @@ class BottomBar extends StatelessWidget {
               Text(
                 text,
                 style: TextStyle(
-                    fontWeight:
-                        GetIt.instance<FeedViewModel>().actualScreen == index
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                    color: GetIt.instance<FeedViewModel>().actualScreen == 0
-                        ? GetIt.instance<FeedViewModel>().actualScreen == index
+                    fontWeight: GetIt.instance<RouterThing>().route == index
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    color: GetIt.instance<RouterThing>().route == 0
+                        ? GetIt.instance<RouterThing>().route == index
                             ? Colors.white
                             : Colors.white70
-                        : GetIt.instance<FeedViewModel>().actualScreen == index
+                        : GetIt.instance<RouterThing>().route == index
                             ? Colors.black
                             : Colors.black54,
                     fontSize: 11.0),

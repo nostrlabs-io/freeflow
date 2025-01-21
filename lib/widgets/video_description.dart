@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:ndk/ndk.dart';
 
 class VideoDescription extends StatelessWidget {
-  final username;
+  final Metadata profile;
   final videtoTitle;
-  final songInfo;
 
-  VideoDescription(this.username, this.videtoTitle, this.songInfo);
+  VideoDescription(this.profile, this.videtoTitle);
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
         child: Container(
-            height: 120.0,
             padding: EdgeInsets.only(left: 20.0),
             child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -19,7 +18,8 @@ class VideoDescription extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    '@' + username,
+                    '@' +
+                        (profile.displayName ?? profile.name ?? profile.pubKey),
                     style: TextStyle(
                         fontSize: 16,
                         color: Colors.white,
@@ -38,7 +38,7 @@ class VideoDescription extends StatelessWidget {
                   SizedBox(
                     height: 7,
                   ),
-                  Row(children: [
+                  /*Row(children: [
                     Icon(
                       Icons.music_note,
                       size: 15.0,
@@ -46,7 +46,7 @@ class VideoDescription extends StatelessWidget {
                     ),
                     Text(songInfo,
                         style: TextStyle(color: Colors.white, fontSize: 14.0))
-                  ]),
+                  ]),*/
                   SizedBox(
                     height: 10,
                   ),
