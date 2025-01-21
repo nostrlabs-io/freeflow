@@ -1,7 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.tiktok_flutter">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
    <application
-        android:label="tiktok_flutter"
+        android:label="freeflow"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

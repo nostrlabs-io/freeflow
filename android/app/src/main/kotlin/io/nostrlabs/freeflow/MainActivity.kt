@@ -1,4 +1,4 @@
-package com.example.freeflow
+package io.nostrlabs.freeflow
 
 import io.flutter.embedding.android.FlutterActivity
 
