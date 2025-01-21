@@ -1,3 +1,4 @@
+import 'package:freeflow/data/imeta.dart';
 import 'package:video_player/video_player.dart';
 
 class Video {
@@ -8,7 +9,12 @@ class Video {
   String songName;
   String likes;
   String comments;
-  String url;
+  List<IMeta> metadata;
+
+  String get url {
+    final m1 = metadata.firstWhere((v) => v.url != null);
+    return m1.url!;
+  }
 
   VideoPlayerController? controller;
 
@@ -20,33 +26,10 @@ class Video {
       required this.songName,
       required this.likes,
       required this.comments,
-      required this.url});
-
-  Video.fromJson(Map<dynamic, dynamic> json)
-      : id = json['id'],
-        user = json['user'],
-        userPic = json['user_pic'],
-        videoTitle = json['video_title'],
-        songName = json['song_name'],
-        likes = json['likes'],
-        comments = json['comments'],
-        url = json['url'];
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['user'] = this.user;
-    data['user_pic'] = this.userPic;
-    data['video_title'] = this.videoTitle;
-    data['song_name'] = this.songName;
-    data['likes'] = this.likes;
-    data['comments'] = this.comments;
-    data['url'] = this.url;
-    return data;
-  }
+      required this.metadata});
 
   Future<Null> loadController() async {
-    controller = VideoPlayerController.network(url);
+    controller = VideoPlayerController.networkUrl(Uri.parse(url));
     await controller?.initialize();
     controller?.setLooping(true);
   }
