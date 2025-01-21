@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:tiktok_flutter/screens/feed_viewmodel.dart';
-import 'package:tiktok_flutter/utils/tik_tok_icons_icons.dart';
+import 'package:freeflow/screens/feed_viewmodel.dart';
+import 'package:freeflow/utils/tik_tok_icons_icons.dart';
 import 'package:get_it/get_it.dart';
 
 class BottomBar extends StatelessWidget {

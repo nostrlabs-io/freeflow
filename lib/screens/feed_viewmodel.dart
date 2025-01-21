@@ -1,18 +1,18 @@
 import 'package:flutter/services.dart';
-import 'package:tiktok_flutter/data/videos_firebase.dart';
+import 'package:freeflow/data/nostr.dart';
 import 'package:stacked/stacked.dart';
 import 'package:video_player/video_player.dart';
 
 class FeedViewModel extends BaseViewModel {
   VideoPlayerController? controller;
-  VideosAPI? videoSource;
+  VideosAPINostr? videoSource;
 
   int prevVideo = 0;
 
   int actualScreen = 0;
 
   FeedViewModel() {
-    videoSource = VideosAPI();
+    videoSource = VideosAPINostr();
   }
 
   changeVideo(index) async {

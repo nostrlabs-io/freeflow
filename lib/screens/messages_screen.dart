@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tiktok_flutter/utils/tik_tok_icons_icons.dart';
+import 'package:freeflow/utils/tik_tok_icons_icons.dart';
 
 class MessagesScreen extends StatefulWidget {
   MessagesScreen({Key? key}) : super(key: key);
