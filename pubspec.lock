@@ -148,10 +148,10 @@ packages:
     dependency: "direct main"
     description:
       name: get_it
-      sha256: d85128a5dae4ea777324730dc65edd9c9f43155c109d5cc0a69cab74139fbac1
+      sha256: f126a3e286b7f5b578bf436d5592968706c4c1de28a228b870ce375d9f743103
       url: "https://pub.dev"
     source: hosted
-    version: "7.7.0"
+    version: "8.0.3"
   html:
     dependency: transitive
     description:
@@ -401,26 +401,26 @@ packages:
     dependency: "direct main"
     description:
       name: stacked
-      sha256: "57d96c98d41c5fb5f295395bd81e482c75b1a6b42229f23e15ff282742cdfb98"
+      sha256: fe77da8b5dae6488a0caa0feea59c4f79a0fb11cd88a211f87f653411a4c142b
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.15+1"
-  stacked_core:
-    dependency: transitive
-    description:
-      name: stacked_core
-      sha256: "28889e0b3cb612bf8f13d85050df43fb386f9483bd0fba6756637d9bc7af23dd"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.4"
+    version: "3.4.4"
   stacked_services:
     dependency: "direct main"
     description:
       name: stacked_services
-      sha256: "7e9e4e2f7b507165fb029449216829e7484f4da41627cef5f3e61b8ad5867231"
+      sha256: a70c5c86f89a9258139ff174bf045a527099ea8552f8497ebb0b755469841bb4
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.26"
+    version: "1.6.0"
+  stacked_shared:
+    dependency: transitive
+    description:
+      name: stacked_shared
+      sha256: "3d69b34d87422b78a7e5123681d3f4bcdd79757170454933f68795c54812d003"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.2"
   stream_channel:
     dependency: transitive
     description:
