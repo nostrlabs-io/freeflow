@@ -20,6 +20,7 @@ dependencies:
   flutter_svg: ^2.0.17
 
 dev_dependencies:
+  flutter_launcher_icons: "^0.14.3"
   flutter_test:
     sdk: flutter
 
@@ -27,5 +28,22 @@ flutter:
   uses-material-design: true
   assets:
     - "assets/svg/"
-    - "assets/logo_512.jpg"
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logo_512.jpg"
+  min_sdk_android: 21
+  web:
+    generate: true
+    background_color: "#000"
+    image_path: "assets/logo_512.jpg"
+    theme_color: "#000"
+  windows:
+    generate: true
+    image_path: "assets/logo_512.jpg"
+    icon_size: 48
+  macos:
+    generate: true
+    image_path: "assets/logo_512.jpg"
 
