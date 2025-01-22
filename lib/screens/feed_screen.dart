@@ -3,7 +3,7 @@ import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/view_model/feed_viewmodel.dart';
 import 'package:freeflow/widgets/actions_toolbar.dart';
-import 'package:freeflow/widgets/bottom_bar.dart';
+import 'package:freeflow/widgets/profile.dart';
 import 'package:freeflow/widgets/video_description.dart';
 import 'package:get_it/get_it.dart';
 import 'package:ndk/ndk.dart';
@@ -17,58 +17,47 @@ class FeedScreen extends StatefulWidget {
 }
 
 class _FeedScreenState extends State<FeedScreen> {
-  final feedViewModel = GetIt.instance<FeedViewModel>();
-
-  @override
-  void initState() {
-    feedViewModel.loadVideo(0);
-    feedViewModel.loadVideo(1);
-
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return videoScreen();
-  }
-
-  Widget videoScreen() {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Expanded(child: feedVideos()),
-              BottomBar(),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget feedVideos() {
     return Stack(
       children: [
         PageView.builder(
-          controller: PageController(
-            initialPage: 0,
-            viewportFraction: 1,
-          ),
-          itemCount: feedViewModel.videos.length,
-          onPageChanged: (index) {
-            index = index % feedViewModel.videos.length;
-            feedViewModel.changeVideo(index);
-          },
-          scrollDirection: Axis.vertical,
+          itemCount: 2,
           itemBuilder: (context, index) {
-            index = index % feedViewModel.videos.length;
-            return FutureBuilder(
-                future: feedViewModel.loadVideo(index),
-                builder: (ctx, data) =>
-                    videoCard(feedViewModel.videos[index], data.data));
+            final feedViewModel = GetIt.instance<FeedViewModel>();
+            if (index == 0) {
+              return FutureBuilder(
+                future: feedViewModel.loadVideoData(),
+                builder: (ctx, data) => PageView.builder(
+                  controller: PageController(
+                    initialPage: feedViewModel.currentVideoIndex,
+                    viewportFraction: 1,
+                  ),
+                  itemCount: feedViewModel.videos.length,
+                  onPageChanged: (index) {
+                    index = index % feedViewModel.videos.length;
+                    feedViewModel.changeVideo(index);
+                  },
+                  scrollDirection: Axis.vertical,
+                  itemBuilder: (context, index) {
+                    index = index % feedViewModel.videos.length;
+                    return FutureBuilder(
+                        future: feedViewModel.loadVideo(index),
+                        builder: (ctx, data) =>
+                            videoCard(feedViewModel.videos[index], data.data));
+                  },
+                ),
+              );
+            } else {
+              final vid = feedViewModel.currentVideo!;
+              return FutureBuilder(
+                  key: Key("profile-card:${vid.user}"),
+                  future: ndk.metadata.loadMetadata(vid.user),
+                  builder: (ctx, data) {
+                    return ProfileWidget(
+                        profile: data.data ?? Metadata(pubKey: vid.user));
+                  });
+            }
           },
         ),
         SafeArea(
@@ -94,7 +83,7 @@ class _FeedScreenState extends State<FeedScreen> {
                   SizedBox(
                     width: 7,
                   ),
-                  Text('For You',
+                  Text("Latest",
                       style: TextStyle(
                           fontSize: 17.0,
                           fontWeight: FontWeight.bold,
@@ -158,7 +147,8 @@ class _FeedScreenState extends State<FeedScreen> {
 
   @override
   void dispose() {
-    feedViewModel.dispose();
+    final feedViewModel = GetIt.instance<FeedViewModel>();
+    feedViewModel.reset();
     super.dispose();
   }
 }

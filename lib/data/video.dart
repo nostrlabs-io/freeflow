@@ -6,11 +6,21 @@ class Video {
   List<IMeta> metadata;
 
   String? get url {
-    if (metadata.length == 0) {
-      return null;
+    for (final m in metadata) {
+      if (m.url != null) {
+        return m.url;
+      }
     }
-    final m1 = metadata.firstWhere((v) => v.url != null);
-    return m1.url;
+    return null;
+  }
+
+  String? get image {
+    for (final m in metadata) {
+      if (m.images != null) {
+        return m.images!.first;
+      }
+    }
+    return null;
   }
 
   String get id {

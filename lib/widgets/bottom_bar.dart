@@ -11,9 +11,9 @@ class BottomBar extends StatelessWidget {
   const BottomBar({Key? key}) : super(key: key);
 
   Widget get customCreateIcon => Container(
-      width: 45.0,
-      height: 27.0,
-      child: Stack(children: [
+      width: CreateButtonWidth,
+      height: 27,
+      child: Stack(alignment: Alignment.center, children: [
         Container(
             margin: EdgeInsets.only(left: 10.0),
             width: CreateButtonWidth,
@@ -43,34 +43,23 @@ class BottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration:
-          BoxDecoration(border: Border(top: BorderSide(color: Colors.black))),
-      child: Column(
-        children: <Widget>[
-          SizedBox(
-            height: 5,
+      margin: EdgeInsets.only(top: 10),
+      child: Row(
+        children: [
+          Expanded(child: menuButton(context, 'Home', TikTokIcons.home, "/")),
+          Expanded(
+              child:
+                  menuButton(context, 'Search', TikTokIcons.search, "/search")),
+          Expanded(
+            child: GestureDetector(
+                onTap: () => context.go("/create"), child: customCreateIcon),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              menuButton(context, 'Home', TikTokIcons.home, "/"),
-              menuButton(context, 'Search', TikTokIcons.search, "/search"),
-              SizedBox(
-                width: 15,
-              ),
-              customCreateIcon,
-              SizedBox(
-                width: 15,
-              ),
-              menuButton(
-                  context, 'Messages', TikTokIcons.messages, "/messages"),
-              menuButton(context, 'Profile', TikTokIcons.profile,
-                  "/profile/3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d")
-            ],
-          ),
-          SizedBox(
-            height: Platform.isIOS ? 40 : 10,
-          )
+          Expanded(
+              child: menuButton(
+                  context, 'Messages', TikTokIcons.messages, "/messages")),
+          Expanded(
+              child: menuButton(
+                  context, 'Profile', TikTokIcons.profile, "/profile/me"))
         ],
       ),
     );
@@ -90,9 +79,7 @@ class BottomBar extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Icon(icon,
-                  color: Colors.white,
-                  size: NavigationIconSize),
+              Icon(icon, color: Colors.white, size: NavigationIconSize),
               SizedBox(
                 height: 7,
               ),

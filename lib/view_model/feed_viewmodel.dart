@@ -1,5 +1,6 @@
 import 'package:freeflow/data/nostr.dart';
 import 'package:freeflow/data/video.dart';
+import 'package:freeflow/main.dart';
 import 'package:video_player/video_player.dart';
 
 class FeedViewModel {
@@ -18,10 +19,12 @@ class FeedViewModel {
     }
     final url = videos[index].url;
     if (url != null) {
-      final c = VideoPlayerController.networkUrl(Uri.parse(url));
+      print("Loading video: #${index} = ${url}");
+      final c = VideoPlayerController.networkUrl(Uri.parse(url),
+          httpHeaders: Map.from({"user-agent": USER_AGENT}));
+      controllers[index] = c;
       await c.initialize();
       c.setLooping(true);
-      controllers[index] = c;
       return c;
     } else {
       return null;
@@ -29,18 +32,23 @@ class FeedViewModel {
   }
 
   changeVideo(int next) async {
-    final cNext = await getController(next);
-    cNext?.play();
+    // stop all players
+    for (final v in controllers.values) {
+      v.pause();
+    }
 
-    final cPrev = await getController(currentVideoIndex);
-    cPrev?.pause();
+    await loadVideo(next);
 
     prevVideoIndex = currentVideoIndex;
     currentVideoIndex = next;
 
-    for (final k in controllers.keys) {
-      if (k < currentVideoIndex - 1 && k > currentVideoIndex) {
-        controllers.remove(k);
+    // cleanup controllers
+    for (final k in [...controllers.keys]) {
+      if (k < currentVideoIndex - 1 || k > currentVideoIndex + 1) {
+        final v = controllers.remove(k);
+        v?.pause();
+        v?.dispose();
+        print("Unloading video: ${k}");
       }
     }
   }
@@ -49,9 +57,6 @@ class FeedViewModel {
    * Load a view controller by index
    */
   Future<VideoPlayerController?> loadVideo(int index) async {
-    if (videos.length == 0) {
-      videos = await VideosAPINostr.load();
-    }
     if (videos.length > index) {
       final c = await getController(index);
       await c?.play();
@@ -61,7 +66,20 @@ class FeedViewModel {
     }
   }
 
-  void dispose() {
+  Future<void> loadVideoData() async {
+    if (videos.length == 0) {
+      videos = await VideosAPINostr.load();
+    }
+  }
+
+  void reset() {
+    videos.clear();
+    for (final p in controllers.values) {
+      p.pause();
+      p.dispose();
+    }
     controllers.clear();
+    prevVideoIndex = 0;
+    currentVideoIndex = 0;
   }
 }

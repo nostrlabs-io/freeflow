@@ -33,27 +33,25 @@ class ProfileWidget extends StatelessWidget {
             ),
           ),
           SingleChildScrollView(
+            primary: true,
             child: Column(
               children: [
                 SizedBox(
                   height: 15,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ClipOval(
-                      child: CachedNetworkImage(
-                        fit: BoxFit.cover,
-                        imageUrl: profile.picture ??
-                            "https://nostr.api.v0l.io/api/v1/avatar/cyberpunks/${profile.pubKey}",
-                        height: 100.0,
-                        width: 100.0,
-                        placeholder: (context, url) =>
-                            CircularProgressIndicator(),
-                        errorWidget: (context, url, error) => Icon(Icons.error),
-                      ),
+                Center(
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      fit: BoxFit.cover,
+                      imageUrl: profile.picture ??
+                          "https://nostr.api.v0l.io/api/v1/avatar/cyberpunks/${profile.pubKey}",
+                      height: 100.0,
+                      width: 100.0,
+                      placeholder: (context, url) =>
+                          CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
                     ),
-                  ],
+                  ),
                 ),
                 SizedBox(
                   height: 10,
@@ -70,11 +68,22 @@ class ProfileWidget extends StatelessWidget {
                   children: [
                     Column(
                       children: [
-                        Text(
-                          "0",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
+                        FutureBuilder(
+                            future: ndk.follows.getContactList(profile.pubKey),
+                            builder: (context, data) {
+                              if (!data.hasData) {
+                                return SizedBox(
+                                  width: 29,
+                                  height: 29,
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
+                              return Text(
+                                (data.data?.contacts.length ?? 0).toString(),
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              );
+                            }),
                         SizedBox(
                           height: 5,
                         ),
@@ -116,16 +125,33 @@ class ProfileWidget extends StatelessWidget {
                     ),
                     Column(
                       children: [
-                        Text(
-                          "0",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
+                        FutureBuilder(
+                            future: ndk.zaps
+                                .fetchZappedReceipts(pubKey: profile.pubKey)
+                                .toList(),
+                            builder: (context, data) {
+                              if (!data.hasData) {
+                                return SizedBox(
+                                  width: 29,
+                                  height: 29,
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
+                              return Text(
+                                formatSats(data.data?.fold(
+                                        0,
+                                        (acc, v) =>
+                                            acc! + (v.amountSats ?? 0)) ??
+                                    0),
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              );
+                            }),
                         SizedBox(
                           height: 5,
                         ),
                         Text(
-                          "Likes",
+                          "Zaps",
                           style: TextStyle(
                               fontSize: 12, fontWeight: FontWeight.normal),
                         ),
@@ -237,7 +263,7 @@ class ProfileWidget extends StatelessWidget {
       child: FittedBox(
         child: CachedNetworkImage(
           fit: BoxFit.fill,
-          imageUrl: "",
+          imageUrl: v.image ?? "",
           placeholder: (context, url) => Padding(
             padding: const EdgeInsets.all(35.0),
             child: CircularProgressIndicator(),
