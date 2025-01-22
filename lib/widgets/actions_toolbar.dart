@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:freeflow/utils/tik_tok_icons_icons.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ndk/ndk.dart';
 
 class ActionsToolbar extends StatelessWidget {
@@ -31,21 +31,20 @@ class ActionsToolbar extends StatelessWidget {
       width: ActionWidgetSize,
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         _getFollowAction(user),
-        _getSocialAction(icon: TikTokIcons.heart, title: numLikes.toString()),
-        _getSocialAction(
-            icon: TikTokIcons.chat_bubble, title: numComments.toString()),
-        _getSocialAction(icon: TikTokIcons.reply, title: 'Share', isShare: true)
+        _getSocialAction(icon: "heart", title: numLikes.toString()),
+        _getSocialAction(icon: "comment", title: numComments.toString()),
+        _getSocialAction(icon: "reply", title: 'Share', isShare: true)
       ]),
     );
   }
 
   Widget _getSocialAction(
-      {required String title, required IconData icon, bool isShare = false}) {
+      {required String title, required String icon, bool isShare = false}) {
     return Container(
         margin: EdgeInsets.only(top: 15.0),
         width: ActionWidgetSize,
         child: Column(children: [
-          Icon(icon, size: isShare ? 25.0 : 35.0, color: Colors.grey[300]),
+          SvgPicture.asset("assets/svg/${icon}.svg"),
           Padding(
             padding: EdgeInsets.only(top: isShare ? 8.0 : 8.0),
             child: Text(title,
@@ -62,10 +61,7 @@ class ActionsToolbar extends StatelessWidget {
         margin: EdgeInsets.symmetric(vertical: 10.0),
         width: ActionWidgetSize,
         height: ActionWidgetSize,
-        child: Stack(children: [
-          _getProfilePicture(profile),
-          _getPlusIcon()
-        ]));
+        child: Stack(children: [_getProfilePicture(profile), _getPlusIcon()]));
   }
 
   Widget _getPlusIcon() {

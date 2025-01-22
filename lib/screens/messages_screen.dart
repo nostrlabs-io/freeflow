@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:freeflow/utils/tik_tok_icons_icons.dart';
+import 'package:flutter_svg/svg.dart';
 
 class MessagesScreen extends StatefulWidget {
   MessagesScreen({Key? key}) : super(key: key);
@@ -44,13 +44,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                TikTokIcons.messages,
-                size: 80,
-                color: Colors.black45,
-              )
-            ],
+            children: [SvgPicture.asset("assets/svg/inbox.svg")],
           ),
           SizedBox(height: 25),
           Text(

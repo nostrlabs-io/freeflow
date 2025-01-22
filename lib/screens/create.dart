@@ -10,9 +10,10 @@ class _CreateShortScreen extends State<CreateShortScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
+          color: Colors.white,
           child: Column(
-        children: [],
-      )),
+            children: [],
+          )),
     );
   }
 }
