@@ -1,7 +1,8 @@
 name: build
-on: [push]
+on: push
 jobs:
   android:
+    runs-on: ubuntu-latest
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
