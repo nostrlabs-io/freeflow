@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/view_model/feed_viewmodel.dart';
-import 'package:freeflow/screens/messages_screen.dart';
-import 'package:freeflow/screens/profile_screen.dart';
-import 'package:freeflow/screens/search_screen.dart';
-import 'package:freeflow/view_model/router.dart';
 import 'package:freeflow/widgets/actions_toolbar.dart';
 import 'package:freeflow/widgets/bottom_bar.dart';
 import 'package:freeflow/widgets/video_description.dart';
 import 'package:get_it/get_it.dart';
 import 'package:ndk/ndk.dart';
-import 'package:stacked/stacked.dart';
 import 'package:video_player/video_player.dart';
 
 class FeedScreen extends StatefulWidget {
@@ -35,50 +29,23 @@ class _FeedScreenState extends State<FeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ViewModelBuilder<FeedViewModel>.reactive(
-        disposeViewModel: false,
-        builder: (context, model, child) => videoScreen(),
-        viewModelBuilder: () => feedViewModel);
+    return videoScreen();
   }
 
   Widget videoScreen() {
     return Scaffold(
-      backgroundColor: GetIt.instance<RouterThing>().route == 0
-          ? Colors.black
-          : Colors.white,
+      backgroundColor: Colors.black,
       body: Stack(
         children: [
-          PageView.builder(
-            itemCount: 2,
-            onPageChanged: (value) {
-              print(value);
-              if (value == 1)
-                SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
-              else
-                SystemChrome.setSystemUIOverlayStyle(
-                    SystemUiOverlayStyle.light);
-            },
-            itemBuilder: (context, index) {
-              if (index == 0)
-                return scrollFeed();
-              else
-                return ProfileScreen(
-                  pubkey: feedViewModel.currentVideo!.user,
-                );
-            },
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Expanded(child: feedVideos()),
+              BottomBar(),
+            ],
           )
         ],
       ),
-    );
-  }
-
-  Widget scrollFeed() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Expanded(child: currentScreen()),
-        BottomBar(),
-      ],
     );
   }
 
@@ -90,15 +57,18 @@ class _FeedScreenState extends State<FeedScreen> {
             initialPage: 0,
             viewportFraction: 1,
           ),
-          itemCount: feedViewModel.videoSource?.listVideos.length,
+          itemCount: feedViewModel.videos.length,
           onPageChanged: (index) {
-            index = index % (feedViewModel.videoSource!.listVideos.length);
+            index = index % feedViewModel.videos.length;
             feedViewModel.changeVideo(index);
           },
           scrollDirection: Axis.vertical,
           itemBuilder: (context, index) {
-            index = index % (feedViewModel.videoSource!.listVideos.length);
-            return videoCard(feedViewModel.videoSource!.listVideos[index]);
+            index = index % feedViewModel.videos.length;
+            return FutureBuilder(
+                future: feedViewModel.loadVideo(index),
+                builder: (ctx, data) =>
+                    videoCard(feedViewModel.videos[index], data.data));
           },
         ),
         SafeArea(
@@ -136,51 +106,34 @@ class _FeedScreenState extends State<FeedScreen> {
     );
   }
 
-  Widget currentScreen() {
-    switch (GetIt.instance<RouterThing>().route) {
-      case 0:
-        return feedVideos();
-      case 1:
-        return SearchScreen();
-      case 2:
-        return MessagesScreen();
-      case 3:
-        return ProfileScreen(
-          pubkey: "3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d",
-        );
-      default:
-        return feedVideos();
-    }
-  }
-
-  Widget videoCard(Video video) {
+  Widget videoCard(Video video, VideoPlayerController? controller) {
     return Stack(
       children: [
-        video.controller != null
-            ? GestureDetector(
-                onTap: () {
-                  if (video.controller!.value.isPlaying) {
-                    video.controller?.pause();
-                  } else {
-                    video.controller?.play();
-                  }
-                },
-                child: SizedBox.expand(
-                    child: FittedBox(
+        GestureDetector(
+          onTap: () {
+            if (controller != null) {
+              if (controller.value.isPlaying) {
+                controller.pause();
+              } else {
+                controller.play();
+              }
+            }
+          },
+          child: controller != null
+              ? SizedBox.expand(
+                  child: FittedBox(
                   fit: BoxFit.cover,
                   child: SizedBox(
-                    width: video.controller?.value.size.width ?? 0,
-                    height: video.controller?.value.size.height ?? 0,
-                    child: VideoPlayer(video.controller!),
+                    width: controller.value.size.width,
+                    height: controller.value.size.height,
+                    child: VideoPlayer(controller),
                   ),
-                )),
-              )
-            : Container(
-                color: Colors.black,
-                child: Center(
-                  child: Text("Loading"),
+                ))
+              : Container(
+                  width: 64,
+                  child: CircularProgressIndicator(),
                 ),
-              ),
+        ),
         FutureBuilder(
           future: ndk.metadata.loadMetadata(video.user),
           initialData: Metadata(pubKey: video.user),
@@ -205,7 +158,7 @@ class _FeedScreenState extends State<FeedScreen> {
 
   @override
   void dispose() {
-    feedViewModel.controller?.dispose();
+    feedViewModel.dispose();
     super.dispose();
   }
 }

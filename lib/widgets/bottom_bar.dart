@@ -1,10 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:freeflow/view_model/feed_viewmodel.dart';
 import 'package:freeflow/utils/tik_tok_icons_icons.dart';
-import 'package:freeflow/view_model/router.dart';
-import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 
 class BottomBar extends StatelessWidget {
   static const double NavigationIconSize = 20.0;
@@ -20,28 +18,23 @@ class BottomBar extends StatelessWidget {
             margin: EdgeInsets.only(left: 10.0),
             width: CreateButtonWidth,
             decoration: BoxDecoration(
-                color: Color.fromARGB(255, 250, 45, 108),
+                color: Color.fromARGB(169, 208, 0, 255),
                 borderRadius: BorderRadius.circular(7.0))),
         Container(
             margin: EdgeInsets.only(right: 10.0),
             width: CreateButtonWidth,
             decoration: BoxDecoration(
-                color: Color.fromARGB(255, 32, 211, 234),
+                color: Color.fromARGB(169, 0, 102, 255),
                 borderRadius: BorderRadius.circular(7.0))),
         Center(
             child: Container(
           height: double.infinity,
           width: CreateButtonWidth,
           decoration: BoxDecoration(
-              color: GetIt.instance<RouterThing>().route == 0
-                  ? Colors.white
-                  : Colors.black,
-              borderRadius: BorderRadius.circular(7.0)),
+              color: Colors.white, borderRadius: BorderRadius.circular(7.0)),
           child: Icon(
             Icons.add,
-            color: GetIt.instance<RouterThing>().route == 0
-                ? Colors.black
-                : Colors.white,
+            color: Colors.black,
             size: 20.0,
           ),
         )),
@@ -51,7 +44,7 @@ class BottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration:
-          BoxDecoration(border: Border(top: BorderSide(color: Colors.black12))),
+          BoxDecoration(border: Border(top: BorderSide(color: Colors.black))),
       child: Column(
         children: <Widget>[
           SizedBox(
@@ -60,8 +53,8 @@ class BottomBar extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              menuButton('Home', TikTokIcons.home, 0),
-              menuButton('Search', TikTokIcons.search, 1),
+              menuButton(context, 'Home', TikTokIcons.home, "/"),
+              menuButton(context, 'Search', TikTokIcons.search, "/search"),
               SizedBox(
                 width: 15,
               ),
@@ -69,8 +62,10 @@ class BottomBar extends StatelessWidget {
               SizedBox(
                 width: 15,
               ),
-              menuButton('Messages', TikTokIcons.messages, 2),
-              menuButton('Profile', TikTokIcons.profile, 3)
+              menuButton(
+                  context, 'Messages', TikTokIcons.messages, "/messages"),
+              menuButton(context, 'Profile', TikTokIcons.profile,
+                  "/profile/3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d")
             ],
           ),
           SizedBox(
@@ -81,10 +76,13 @@ class BottomBar extends StatelessWidget {
     );
   }
 
-  Widget menuButton(String text, IconData icon, int index) {
+  Widget menuButton(
+      BuildContext context, String text, IconData icon, String path) {
+    final theme = Theme.of(context);
+
     return GestureDetector(
         onTap: () {
-          GetIt.instance<RouterThing>().setRoute(index);
+          context.go(path);
         },
         child: Container(
           height: 45,
@@ -93,13 +91,7 @@ class BottomBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Icon(icon,
-                  color: GetIt.instance<RouterThing>().route == 0
-                      ? GetIt.instance<RouterThing>().route == index
-                          ? Colors.white
-                          : Colors.white70
-                      : GetIt.instance<RouterThing>().route == index
-                          ? Colors.black
-                          : Colors.black54,
+                  color: Colors.white,
                   size: NavigationIconSize),
               SizedBox(
                 height: 7,
@@ -107,16 +99,8 @@ class BottomBar extends StatelessWidget {
               Text(
                 text,
                 style: TextStyle(
-                    fontWeight: GetIt.instance<RouterThing>().route == index
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                    color: GetIt.instance<RouterThing>().route == 0
-                        ? GetIt.instance<RouterThing>().route == index
-                            ? Colors.white
-                            : Colors.white70
-                        : GetIt.instance<RouterThing>().route == index
-                            ? Colors.black
-                            : Colors.black54,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.white,
                     fontSize: 11.0),
               )
             ],

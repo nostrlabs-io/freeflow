@@ -1,44 +1,67 @@
 import 'package:freeflow/data/nostr.dart';
 import 'package:freeflow/data/video.dart';
-import 'package:stacked/stacked.dart';
 import 'package:video_player/video_player.dart';
 
-class FeedViewModel extends BaseViewModel {
-  VideoPlayerController? controller;
-  VideosAPINostr? videoSource;
-
+class FeedViewModel {
+  List<Video> videos = List.empty();
+  Map<int, VideoPlayerController> controllers = Map();
   int prevVideoIndex = 0;
   int currentVideoIndex = 0;
 
-  FeedViewModel() {
-    videoSource = VideosAPINostr();
+  Video? get currentVideo {
+    return videos[currentVideoIndex];
   }
 
-  Video? get currentVideo {
-    return videoSource?.listVideos[currentVideoIndex];
+  Future<VideoPlayerController?> getController(int index) async {
+    if (controllers.containsKey(index)) {
+      return controllers[index]!;
+    }
+    final url = videos[index].url;
+    if (url != null) {
+      final c = VideoPlayerController.networkUrl(Uri.parse(url));
+      await c.initialize();
+      c.setLooping(true);
+      controllers[index] = c;
+      return c;
+    } else {
+      return null;
+    }
   }
 
   changeVideo(int next) async {
-    if (videoSource!.listVideos[next].controller == null) {
-      await videoSource!.listVideos[next].loadController();
-    }
-    videoSource!.listVideos[next].controller?.play();
+    final cNext = await getController(next);
+    cNext?.play();
 
-    if (videoSource!.listVideos[prevVideoIndex].controller != null) {
-      videoSource!.listVideos[prevVideoIndex].controller!.dispose();
-    }
+    final cPrev = await getController(currentVideoIndex);
+    cPrev?.pause();
 
     prevVideoIndex = currentVideoIndex;
     currentVideoIndex = next;
-    notifyListeners();
+
+    for (final k in controllers.keys) {
+      if (k < currentVideoIndex - 1 && k > currentVideoIndex) {
+        controllers.remove(k);
+      }
+    }
   }
 
-  void loadVideo(int index) async {
-    await videoSource!.load();
-    if (videoSource!.listVideos.length > index) {
-      await videoSource!.listVideos[index].loadController();
-      videoSource!.listVideos[index].controller?.play();
-      notifyListeners();
+  /**
+   * Load a view controller by index
+   */
+  Future<VideoPlayerController?> loadVideo(int index) async {
+    if (videos.length == 0) {
+      videos = await VideosAPINostr.load();
     }
+    if (videos.length > index) {
+      final c = await getController(index);
+      await c?.play();
+      return c;
+    } else {
+      return null;
+    }
+  }
+
+  void dispose() {
+    controllers.clear();
   }
 }
