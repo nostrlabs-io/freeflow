@@ -12,7 +12,9 @@ class _CreateShortScreen extends State<CreateShortScreen> {
       child: Container(
           color: Colors.white,
           child: Column(
-            children: [],
+            children: [
+              Text("Coming soon...")
+            ],
           )),
     );
   }

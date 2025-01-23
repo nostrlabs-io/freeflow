@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:freeflow/view_model/login.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 class BottomBar extends StatelessWidget {
@@ -41,6 +43,7 @@ class BottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final login = GetIt.I.get<LoginData>();
     return Container(
       margin: EdgeInsets.only(top: 10, bottom: 2),
       child: Row(
@@ -53,7 +56,12 @@ class BottomBar extends StatelessWidget {
           ),
           Expanded(child: menuButton(context, 'Inbox', "inbox", "/messages")),
           Expanded(
-              child: menuButton(context, 'Profile', "profile", "/profile/me"))
+              child: AnimatedBuilder(
+                  animation: login,
+                  builder: (context, data) {
+                    return menuButton(context, 'Profile', "profile",
+                        login.value == null ? "/login" : "/profile/me");
+                  }))
         ],
       ),
     );
@@ -61,6 +69,7 @@ class BottomBar extends StatelessWidget {
 
   Widget menuButton(
       BuildContext context, String text, String icon, String path) {
+    final state = GoRouterState.of(context);
     return GestureDetector(
         onTap: () {
           context.go(path);
@@ -71,7 +80,8 @@ class BottomBar extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              SvgPicture.asset("assets/svg/${icon}.svg"),
+              SvgPicture.asset(
+                  "assets/svg/${icon}${state.fullPath == path ? "_filled" : ""}.svg"),
               SizedBox(
                 height: 7,
               ),
