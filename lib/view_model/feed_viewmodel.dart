@@ -1,10 +1,10 @@
-import 'package:freeflow/data/nostr.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
+import 'package:ndk/domain_layer/entities/filter.dart';
 import 'package:video_player/video_player.dart';
 
 class FeedViewModel {
-  List<Video> videos = List.empty();
+  List<Video> videos = List.empty(growable: true);
   Map<int, VideoPlayerController> controllers = Map();
   int prevVideoIndex = 0;
   int currentVideoIndex = 0;
@@ -66,10 +66,15 @@ class FeedViewModel {
     }
   }
 
-  Future<void> loadVideoData() async {
+  Future<List<Video>> loadVideoData(List<String>? authors) async {
     if (videos.length == 0) {
-      videos = await VideosAPINostr.load();
+      final response = ndk.requests.query(filters: [
+        Filter(kinds: [SHORT_KIND], limit: 20, authors: authors)
+      ]);
+      videos =
+          await response.stream.asyncMap((e) => Video.fromEvent(e)).toList();
     }
+    return videos;
   }
 
   void reset() {

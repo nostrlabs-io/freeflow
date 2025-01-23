@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/view_model/feed_viewmodel.dart';
+import 'package:freeflow/view_model/login.dart';
 import 'package:freeflow/widgets/actions_toolbar.dart';
 import 'package:freeflow/widgets/profile.dart';
 import 'package:freeflow/widgets/video_description.dart';
@@ -16,7 +17,11 @@ class FeedScreen extends StatefulWidget {
   _FeedScreenState createState() => _FeedScreenState();
 }
 
+enum FeedTab { Following, Latest }
+
 class _FeedScreenState extends State<FeedScreen> {
+  FeedTab _tab = FeedTab.Latest;
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -26,27 +31,50 @@ class _FeedScreenState extends State<FeedScreen> {
           itemBuilder: (context, index) {
             final feedViewModel = GetIt.instance<FeedViewModel>();
             if (index == 0) {
-              return FutureBuilder(
-                future: feedViewModel.loadVideoData(),
-                builder: (ctx, data) => PageView.builder(
-                  controller: PageController(
-                    initialPage: feedViewModel.currentVideoIndex,
-                    viewportFraction: 1,
-                  ),
-                  itemCount: feedViewModel.videos.length,
-                  onPageChanged: (index) {
-                    index = index % feedViewModel.videos.length;
-                    feedViewModel.changeVideo(index);
-                  },
-                  scrollDirection: Axis.vertical,
-                  itemBuilder: (context, index) {
-                    index = index % feedViewModel.videos.length;
-                    return FutureBuilder(
-                        future: feedViewModel.loadVideo(index),
-                        builder: (ctx, data) =>
-                            videoCard(feedViewModel.videos[index], data.data));
-                  },
-                ),
+              return FutureBuilder<List<Video>>(
+                key: Key("feed-view:${_tab.name}"),
+                future: () async {
+                  final acc = GetIt.I.get<LoginData>().value;
+                  final authors =
+                      acc?.pubkey != null && _tab == FeedTab.Following
+                          ? (await ndk.follows.getContactList(acc!.pubkey))
+                              ?.contacts
+                          : null;
+                  feedViewModel.reset();
+                  print(
+                      "Loading feed ${_tab.name}, authors=${authors?.length}");
+                  return await feedViewModel.loadVideoData(authors);
+                }(),
+                builder: (ctx, data) {
+                  final videos = data.data;
+                  return PageView.builder(
+                    controller: PageController(
+                      initialPage: feedViewModel.currentVideoIndex,
+                      viewportFraction: 1,
+                    ),
+                    itemCount: videos?.length ?? 0,
+                    onPageChanged: (index) {
+                      index = index % (videos?.length ?? 1);
+                      feedViewModel.changeVideo(index);
+                    },
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (context, index) {
+                      index = index % (videos?.length ?? 1);
+                      return FutureBuilder(
+                          future: feedViewModel.loadVideo(index),
+                          builder: (ctx, data) {
+                            final vid = videos != null && videos.length > index
+                                ? videos[index]
+                                : null;
+                            if (vid == null) {
+                              return SizedBox.shrink();
+                            } else {
+                              return videoCard(vid, data.data);
+                            }
+                          });
+                    },
+                  );
+                },
               );
             } else {
               final vid = feedViewModel.currentVideo!;
@@ -64,31 +92,55 @@ class _FeedScreenState extends State<FeedScreen> {
           child: Container(
             padding: EdgeInsets.only(top: 20),
             child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text('Following',
-                      style: TextStyle(
-                          fontSize: 17.0,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.white70)),
-                  SizedBox(
-                    width: 7,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                GestureDetector(
+                  onTap: () => setState(() {
+                    _tab = FeedTab.Following;
+                  }),
+                  child: Text(
+                    'Following',
+                    style: TextStyle(
+                        fontSize: 17.0,
+                        fontWeight: _tab == FeedTab.Following
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                        color: _tab == FeedTab.Following
+                            ? Colors.white
+                            : Colors.white70),
                   ),
-                  Container(
-                    color: Colors.white70,
-                    height: 10,
-                    width: 1.0,
+                ),
+                SizedBox(
+                  width: 7,
+                ),
+                Container(
+                  color: Colors.white70,
+                  height: 10,
+                  width: 1.0,
+                ),
+                SizedBox(
+                  width: 7,
+                ),
+                GestureDetector(
+                  onTap: () => setState(() {
+                    _tab = FeedTab.Latest;
+                  }),
+                  child: Text(
+                    "Latest",
+                    style: TextStyle(
+                      fontSize: 17.0,
+                      fontWeight: _tab == FeedTab.Latest
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: _tab == FeedTab.Latest
+                          ? Colors.white
+                          : Colors.white70,
+                    ),
                   ),
-                  SizedBox(
-                    width: 7,
-                  ),
-                  Text("Latest",
-                      style: TextStyle(
-                          fontSize: 17.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white))
-                ]),
+                ),
+              ],
+            ),
           ),
         ),
       ],
