@@ -225,7 +225,7 @@ class ProfileWidget extends StatelessWidget {
                     stream: ndk.requests
                         .query(filters: [
                           Filter(
-                              kinds: [SHORT_KIND],
+                              kinds: SHORT_KIND,
                               authors: [profile.pubKey],
                               limit: 10)
                         ])

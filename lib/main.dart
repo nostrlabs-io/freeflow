@@ -81,7 +81,7 @@ final ndk = Ndk(
   ),
 );
 
-final SHORT_KIND = 34236;
+final SHORT_KIND = [22, 34236];
 final USER_AGENT = "freeflow/1.0";
 
 String formatSats(int n) {

@@ -197,8 +197,8 @@ class _FeedScreenState extends State<FeedScreen> {
                 children: <Widget>[
                   VideoDescription(data.data ?? Metadata(pubKey: video.user),
                       video.videoTitle),
-                  ActionsToolbar(video.likes, video.comments,
-                      data.data ?? Metadata(pubKey: video.user)),
+                  ActionsToolbar(
+                      video, data.data ?? Metadata(pubKey: video.user)),
                 ],
               ),
               SizedBox(height: 20)

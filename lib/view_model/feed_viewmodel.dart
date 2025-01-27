@@ -69,7 +69,7 @@ class FeedViewModel {
   Future<List<Video>> loadVideoData(List<String>? authors) async {
     if (videos.length == 0) {
       final response = ndk.requests.query(filters: [
-        Filter(kinds: [SHORT_KIND], limit: 20, authors: authors)
+        Filter(kinds: SHORT_KIND, limit: 20, authors: authors)
       ]);
       videos =
           await response.stream.asyncMap((e) => Video.fromEvent(e)).toList();

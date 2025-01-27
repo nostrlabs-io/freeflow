@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:freeflow/data/video.dart';
+import 'package:freeflow/main.dart';
 import 'package:ndk/ndk.dart';
 
 class ActionsToolbar extends StatelessWidget {
@@ -19,11 +21,10 @@ class ActionsToolbar extends StatelessWidget {
 // The size of the plus icon under the profile image in follow action
   static const double PlusIconSize = 20.0;
 
-  final int numLikes;
-  final int numComments;
+  final Video video;
   final Metadata user;
 
-  ActionsToolbar(this.numLikes, this.numComments, this.user);
+  ActionsToolbar(this.video, this.user);
 
   @override
   Widget build(BuildContext context) {
@@ -31,27 +32,35 @@ class ActionsToolbar extends StatelessWidget {
       width: ActionWidgetSize,
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         _getFollowAction(user),
-        _getSocialAction(icon: "heart", title: numLikes.toString()),
-        _getSocialAction(icon: "comment", title: numComments.toString()),
-        _getSocialAction(icon: "reply", title: 'Share', isShare: true)
+        _getSocialAction(icon: "heart", kind: 7),
+        _getSocialAction(icon: "comment", kind: 1111),
+        _getSocialAction(icon: "reply", kind: 0, title: 'Share')
       ]),
     );
   }
 
   Widget _getSocialAction(
-      {required String title, required String icon, bool isShare = false}) {
+      {required String icon, required int kind, String? title}) {
     return Container(
         margin: EdgeInsets.only(top: 15.0),
         width: ActionWidgetSize,
         child: Column(children: [
           SvgPicture.asset("assets/svg/${icon}.svg"),
           Padding(
-            padding: EdgeInsets.only(top: isShare ? 8.0 : 8.0),
-            child: Text(title,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                    fontSize: isShare ? 14.0 : 14.0)),
+            padding: EdgeInsets.only(top: 8),
+            child: FutureBuilder(
+                future: ndk.requests.query(filters: [
+                  Filter(kinds: [kind], eTags: [video.id])
+                ]).future,
+                builder: (ctx, data) {
+                  return Text(
+                    title ?? data.data?.length.toString() ?? "0",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14.0),
+                  );
+                }),
           )
         ]));
   }
