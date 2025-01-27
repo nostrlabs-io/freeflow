@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
+import 'package:freeflow/imgproxy.dart';
 import 'package:freeflow/main.dart';
 import 'package:ndk/ndk.dart';
 
@@ -240,7 +241,7 @@ class ProfileWidget extends StatelessWidget {
                                     crossAxisCount: 3),
                             itemBuilder: (ctx, idx) {
                               return _profileTile(
-                                  Video.fromEvent(snapshot.data![idx]));
+                                  ctx, Video.fromEvent(snapshot.data![idx]));
                             });
                       } else {
                         return CircularProgressIndicator();
@@ -254,23 +255,21 @@ class ProfileWidget extends StatelessWidget {
     );
   }
 
-  Widget _profileTile(Video v) {
+  Widget _profileTile(BuildContext context, Video v) {
     return Container(
       height: 160,
       decoration: BoxDecoration(
           color: Colors.black26,
           border: Border.all(color: Colors.white70, width: .5)),
-      child: FittedBox(
-        child: CachedNetworkImage(
-          fit: BoxFit.fill,
-          imageUrl: v.image ?? "",
-          placeholder: (context, url) => Padding(
-            padding: const EdgeInsets.all(35.0),
-            child: CircularProgressIndicator(),
-          ),
-          errorWidget: (context, url, error) => Icon(Icons.error),
+      child: CachedNetworkImage(
+        fit: BoxFit.contain,
+        imageUrl: proxyImg(context, v.image ?? v.url ?? "",
+            resize: 160),
+        placeholder: (context, url) => Padding(
+          padding: const EdgeInsets.all(35.0),
+          child: CircularProgressIndicator(),
         ),
-        fit: BoxFit.fill,
+        errorWidget: (context, url, error) => Icon(Icons.error),
       ),
     );
   }

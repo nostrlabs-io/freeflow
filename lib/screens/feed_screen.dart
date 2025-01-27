@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
+import 'package:freeflow/imgproxy.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/view_model/feed_viewmodel.dart';
 import 'package:freeflow/view_model/login.dart';
@@ -69,7 +71,7 @@ class _FeedScreenState extends State<FeedScreen> {
                             if (vid == null) {
                               return SizedBox.shrink();
                             } else {
-                              return videoCard(vid, data.data);
+                              return videoCard(context, vid, data.data);
                             }
                           });
                     },
@@ -82,8 +84,11 @@ class _FeedScreenState extends State<FeedScreen> {
                   key: Key("profile-card:${vid.user}"),
                   future: ndk.metadata.loadMetadata(vid.user),
                   builder: (ctx, data) {
-                    return ProfileWidget(
-                        profile: data.data ?? Metadata(pubKey: vid.user));
+                    return SafeArea(
+                      child: ProfileWidget(
+                        profile: data.data ?? Metadata(pubKey: vid.user),
+                      ),
+                    );
                   });
             }
           },
@@ -147,7 +152,8 @@ class _FeedScreenState extends State<FeedScreen> {
     );
   }
 
-  Widget videoCard(Video video, VideoPlayerController? controller) {
+  Widget videoCard(
+      BuildContext context, Video video, VideoPlayerController? controller) {
     return Stack(
       children: [
         GestureDetector(
@@ -170,14 +176,18 @@ class _FeedScreenState extends State<FeedScreen> {
                     child: VideoPlayer(controller),
                   ),
                 ))
-              : Container(
-                  width: 64,
-                  child: CircularProgressIndicator(),
+              : SizedBox.expand(
+                  child: FittedBox(
+                    fit: BoxFit.cover,
+                    child: CachedNetworkImage(
+                      imageUrl:
+                          proxyImg(context, video.image ?? video.url ?? ""),
+                    ),
+                  ),
                 ),
         ),
         FutureBuilder(
           future: ndk.metadata.loadMetadata(video.user),
-          initialData: Metadata(pubKey: video.user),
           builder: (state, data) => Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
@@ -185,8 +195,10 @@ class _FeedScreenState extends State<FeedScreen> {
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
-                  VideoDescription(data.data!, video.videoTitle),
-                  ActionsToolbar(video.likes, video.comments, data.data!),
+                  VideoDescription(data.data ?? Metadata(pubKey: video.user),
+                      video.videoTitle),
+                  ActionsToolbar(video.likes, video.comments,
+                      data.data ?? Metadata(pubKey: video.user)),
                 ],
               ),
               SizedBox(height: 20)
