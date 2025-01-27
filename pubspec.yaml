@@ -20,6 +20,7 @@ dependencies:
   flutter_svg: ^2.0.17
   convert: ^3.1.2
   crypto: ^3.0.6
+  wakelock_plus: ^1.2.10
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.3"

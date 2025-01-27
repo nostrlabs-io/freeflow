@@ -44,8 +44,11 @@ class ProfileWidget extends StatelessWidget {
                   child: ClipOval(
                     child: CachedNetworkImage(
                       fit: BoxFit.cover,
-                      imageUrl: profile.picture ??
-                          "https://nostr.api.v0l.io/api/v1/avatar/cyberpunks/${profile.pubKey}",
+                      imageUrl: proxyImg(
+                          context,
+                          profile.picture ??
+                              "https://nostr.api.v0l.io/api/v1/avatar/cyberpunks/${profile.pubKey}",
+                          resize: 100),
                       height: 100.0,
                       width: 100.0,
                       placeholder: (context, url) =>
@@ -263,8 +266,7 @@ class ProfileWidget extends StatelessWidget {
           border: Border.all(color: Colors.white70, width: .5)),
       child: CachedNetworkImage(
         fit: BoxFit.contain,
-        imageUrl: proxyImg(context, v.image ?? v.url ?? "",
-            resize: 160),
+        imageUrl: proxyImg(context, v.image ?? v.url ?? "", resize: 160),
         placeholder: (context, url) => Padding(
           padding: const EdgeInsets.all(35.0),
           child: CircularProgressIndicator(),

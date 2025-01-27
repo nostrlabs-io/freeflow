@@ -11,6 +11,7 @@ import 'package:freeflow/widgets/video_description.dart';
 import 'package:get_it/get_it.dart';
 import 'package:ndk/ndk.dart';
 import 'package:video_player/video_player.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class FeedScreen extends StatefulWidget {
   FeedScreen({Key? key}) : super(key: key);
@@ -23,6 +24,12 @@ enum FeedTab { Following, Latest }
 
 class _FeedScreenState extends State<FeedScreen> {
   FeedTab _tab = FeedTab.Latest;
+
+  @override
+  void initState() {
+    WakelockPlus.enable();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -211,6 +218,7 @@ class _FeedScreenState extends State<FeedScreen> {
 
   @override
   void dispose() {
+    WakelockPlus.disable();
     final feedViewModel = GetIt.instance<FeedViewModel>();
     feedViewModel.reset();
     super.dispose();
