@@ -13,7 +13,9 @@ class _NewAccountScreen extends State<NewAccountScreen> {
         color: Colors.white,
         padding: EdgeInsets.symmetric(horizontal: 10),
         child: Column(
-          children: [],
+          children: [
+            Text("Coming soon...")
+          ],
         ),
       ),
     );
