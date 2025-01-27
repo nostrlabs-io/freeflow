@@ -33,6 +33,7 @@ class _FeedScreenState extends State<FeedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final acc = GetIt.I.get<LoginData>().value;
     return Stack(
       children: [
         PageView.builder(
@@ -43,7 +44,6 @@ class _FeedScreenState extends State<FeedScreen> {
               return FutureBuilder<List<Video>>(
                 key: Key("feed-view:${_tab.name}"),
                 future: () async {
-                  final acc = GetIt.I.get<LoginData>().value;
                   final authors =
                       acc?.pubkey != null && _tab == FeedTab.Following
                           ? (await ndk.follows.getContactList(acc!.pubkey))
@@ -107,33 +107,37 @@ class _FeedScreenState extends State<FeedScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                GestureDetector(
-                  onTap: () => setState(() {
-                    _tab = FeedTab.Following;
-                  }),
-                  child: Text(
-                    'Following',
-                    style: TextStyle(
-                        fontSize: 17.0,
-                        fontWeight: _tab == FeedTab.Following
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                        color: _tab == FeedTab.Following
-                            ? Colors.white
-                            : Colors.white70),
-                  ),
-                ),
-                SizedBox(
-                  width: 7,
-                ),
-                Container(
-                  color: Colors.white70,
-                  height: 10,
-                  width: 1.0,
-                ),
-                SizedBox(
-                  width: 7,
-                ),
+                ...(acc != null
+                    ? [
+                        GestureDetector(
+                          onTap: () => setState(() {
+                            _tab = FeedTab.Following;
+                          }),
+                          child: Text(
+                            'Following',
+                            style: TextStyle(
+                                fontSize: 17.0,
+                                fontWeight: _tab == FeedTab.Following
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: _tab == FeedTab.Following
+                                    ? Colors.white
+                                    : Colors.white70),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 7,
+                        ),
+                        Container(
+                          color: Colors.white70,
+                          height: 10,
+                          width: 1.0,
+                        ),
+                        SizedBox(
+                          width: 7,
+                        ),
+                      ]
+                    : []),
                 GestureDetector(
                   onTap: () => setState(() {
                     _tab = FeedTab.Latest;
