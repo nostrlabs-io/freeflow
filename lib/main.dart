@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freeflow/screens/create.dart';
+import 'package:freeflow/screens/create_preview.dart';
 import 'package:freeflow/screens/feed_screen.dart';
 import 'package:freeflow/screens/layout.dart';
 import 'package:freeflow/screens/login.dart';
@@ -12,6 +13,7 @@ import 'package:freeflow/view_model/login.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
+import 'package:ndk_objectbox/ndk_objectbox.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,6 +53,12 @@ Future<void> main() async {
               GoRoute(
                 path: "/create",
                 builder: (context, state) => CreateShortScreen(),
+                routes: [
+                  GoRoute(
+                      path: "preview",
+                      builder: (context, state) =>
+                          CreatePreview(state.extra as List<RecordingSegment>)),
+                ],
               ),
               GoRoute(
                   path: "/login",
@@ -77,7 +85,7 @@ class NoVerify extends EventVerifier {
 final ndk = Ndk(
   NdkConfig(
     eventVerifier: NoVerify(),
-    cache: MemCacheManager(),
+    cache: DbObjectBox(),
   ),
 );
 

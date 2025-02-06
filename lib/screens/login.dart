@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freeflow/view_model/login.dart';
+import 'package:freeflow/widgets/button.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
@@ -51,16 +52,19 @@ class _LoginScreen extends State<LoginScreen> {
                       ))),
               Row(children: [
                 Expanded(
-                    child: ElevatedButton(
-                        onPressed: () {
-                          final keyData = Nip19.decode(_key.text);
-                          if (keyData.length > 0) {
-                            GetIt.I.get<LoginData>().value =
-                                Account.nip19(_key.text);
-                            context.go("/");
-                          }
-                        },
-                        child: Text("Login")))
+                  child: BasicButton.text(
+                    "Login",
+                    fontSize: 16,
+                    onTap: () {
+                      final keyData = Nip19.decode(_key.text);
+                      if (keyData.length > 0) {
+                        GetIt.I.get<LoginData>().value =
+                            Account.nip19(_key.text);
+                        context.go("/");
+                      }
+                    },
+                  ),
+                ),
               ]),
               SizedBox(
                 height: 20,
@@ -83,9 +87,11 @@ class _LoginScreen extends State<LoginScreen> {
               ),
               Row(children: [
                 Expanded(
-                    child: ElevatedButton(
-                        onPressed: () => context.go("./new"),
-                        child: Text("Create Account")))
+                    child: BasicButton.text(
+                  "Create Account",
+                  fontSize: 16,
+                  onTap: () => context.go("./new"),
+                ))
               ]),
             ],
           )),

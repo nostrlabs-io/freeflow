@@ -15,17 +15,18 @@ dependencies:
   get_it: ^8.0.3
   cached_network_image: ^3.4.1
   ndk: ^0.2.5
+  ndk_objectbox: ^0.2.0
   go_router: ^14.6.3
   flutter_secure_storage: ^9.2.4
   flutter_svg: ^2.0.17
   convert: ^3.1.2
   crypto: ^3.0.6
   wakelock_plus: ^1.2.10
+  image_picker: ^1.1.2
+  camera: ^0.11.1
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.3"
-  flutter_test:
-    sdk: flutter
 
 flutter:
   uses-material-design: true

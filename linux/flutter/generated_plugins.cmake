@@ -3,7 +3,9 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  file_selector_linux
   flutter_secure_storage_linux
+  objectbox_flutter_libs
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
