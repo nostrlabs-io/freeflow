@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:freeflow/metadata.dart';
 import 'package:freeflow/screens/create.dart';
 import 'package:freeflow/screens/feed_screen.dart';
 import 'package:freeflow/screens/layout.dart';
@@ -11,17 +12,23 @@ import 'package:freeflow/view_model/feed_viewmodel.dart';
 import 'package:freeflow/view_model/login.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ndk/ndk.dart';
+import 'package:nostr_sdk/nostr_sdk.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await NostrSdk.init();
+  NOSTR.addRelay(url: "wss://nos.lol");
+  NOSTR.addRelay(url: "wss://relay.damus.io");
+  NOSTR.addRelay(url: "wss://relay.snort.social");
+  NOSTR.connect();
 
   final l = LoginData();
 
   // reload / cache login data
   l.addListener(() {
-    ndk.metadata.loadMetadata(l.value!.pubkey);
-    ndk.follows.getContactList(l.value!.pubkey);
+    // ndk.metadata.loadMetadata(l.value!.pubkey);
+    // ndk.follows.getContactList(l.value!.pubkey);
   });
 
   await l.load();
@@ -67,22 +74,63 @@ Future<void> main() async {
   ));
 }
 
-class NoVerify extends EventVerifier {
-  @override
-  Future<bool> verify(Nip01Event event) {
-    return Future.value(true);
+final SHORT_KIND = [22, 34236];
+final USER_AGENT = "freeflow/1.0";
+
+final NOSTR = Client.builder().build();
+
+class N {
+  static Future<Set<String>> contactList(String pubkey) async {
+    final evs = await NOSTR.fetchEvents(
+        filter: Filter()
+            .kind(kind: 3)
+            .author(author: PublicKey.parse(publicKey: pubkey)),
+        timeout: Duration(seconds: 30));
+
+    return evs
+            .first()
+            ?.tags()
+            .where((t) => t.kind() == "p")
+            .map((t) => t.content())
+            .where((t) => t != null)
+            .map((t) => t!)
+            .toSet() ??
+        new Set();
+  }
+
+  static Future<Metadata?> profile(String pubkey) async {
+    final evs = await NOSTR.fetchEvents(
+        filter: Filter()
+            .kind(kind: 0)
+            .author(author: PublicKey.parse(publicKey: pubkey)),
+        timeout: Duration(seconds: 30));
+    final json = evs.first()?.content();
+    if (json != null) {
+      return Metadata.fromString(json);
+    } else {
+      return null;
+    }
+  }
+
+  static Future<List<ParsedZap>> zapReceipts(String pubkey) async {
+    final evs = await NOSTR.fetchEvents(
+        filter: Filter()
+            .kind(kind: 9735)
+            .pubkey(pubkey: PublicKey.parse(publicKey: pubkey)),
+        timeout: Duration(seconds: 30));
+    return evs.toVec().map((e) => ParsedZap.fromEvent(e)).toList();
   }
 }
 
-final ndk = Ndk(
-  NdkConfig(
-    eventVerifier: NoVerify(),
-    cache: MemCacheManager(),
-  ),
-);
+class ParsedZap {
+  int? amount;
 
-final SHORT_KIND = [22, 34236];
-final USER_AGENT = "freeflow/1.0";
+  ParsedZap(this.amount);
+
+  static ParsedZap fromEvent(Event e) {
+    return ParsedZap(null);
+  }
+}
 
 String formatSats(int n) {
   if (n > 1000000) {

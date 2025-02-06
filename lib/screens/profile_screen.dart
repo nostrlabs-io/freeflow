@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:freeflow/main.dart';
+import 'package:freeflow/metadata.dart';
 import 'package:freeflow/view_model/login.dart';
 import 'package:freeflow/widgets/profile.dart';
 import 'package:get_it/get_it.dart';
-import 'package:ndk/ndk.dart';
 
 class ProfileScreen extends StatelessWidget {
   final String pubkey;
@@ -16,13 +16,12 @@ class ProfileScreen extends StatelessWidget {
       return SizedBox();
     }
     final thisPubkey = pubkey == "me" ? login.value!.pubkey : pubkey;
-    final init = Metadata(pubKey: thisPubkey);
     return SafeArea(
         child: FutureBuilder(
-            future: ndk.metadata.loadMetadata(thisPubkey),
-            initialData: init,
+            future: N.profile(thisPubkey),
             builder: (state, data) {
-              return ProfileWidget(profile: data.data ?? init);
+              return ProfileWidget(
+                  pubkey: thisPubkey, profile: data.data ?? Metadata.empty());
             }));
   }
 }

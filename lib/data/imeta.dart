@@ -1,4 +1,4 @@
-import 'package:ndk/ndk.dart';
+import 'package:nostr_sdk/nostr_sdk.dart';
 
 class IMeta {
   (int, int)? dimensions = null;
@@ -8,14 +8,14 @@ class IMeta {
   List<String>? images = null;
   List<String>? fallback = null;
 
-  static List<IMeta> fromEvent(Nip01Event event) {
+  static List<IMeta> fromEvent(Event event) {
     List<IMeta> tags = List.empty(growable: true);
-    for (final tag in event.tags) {
-      if (tag.first != "imeta") {
+    for (final tag in event.tags()) {
+      if (tag.kind() != "imeta") {
         continue;
       }
       var r = IMeta();
-      for (final e in tag.skip(1)) {
+      for (final e in tag.asVec().skip(1)) {
         final es = e.split(" ");
         if (es.length < 2) {
           continue;

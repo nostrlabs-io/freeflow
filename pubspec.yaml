@@ -14,13 +14,16 @@ dependencies:
   video_player: ^2.9.2
   get_it: ^8.0.3
   cached_network_image: ^3.4.1
-  ndk: ^0.2.5
+  nostr_sdk:
+    path: "../nostr-sdk-flutter"
   go_router: ^14.6.3
   flutter_secure_storage: ^9.2.4
   flutter_svg: ^2.0.17
   convert: ^3.1.2
   crypto: ^3.0.6
   wakelock_plus: ^1.2.10
+  bech32: ^0.2.2
+  bip340: ^0.3.0
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.3"

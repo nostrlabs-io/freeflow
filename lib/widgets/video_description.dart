@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:ndk/ndk.dart';
+import 'package:freeflow/metadata.dart';
 
 class VideoDescription extends StatelessWidget {
+  final String pubkey;
   final Metadata profile;
   final videtoTitle;
 
-  VideoDescription(this.profile, this.videtoTitle);
+  VideoDescription(this.pubkey, this.profile, this.videtoTitle);
 
   @override
   Widget build(BuildContext context) {
@@ -18,8 +19,7 @@ class VideoDescription extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    '@' +
-                        (profile.displayName ?? profile.name ?? profile.pubKey),
+                    '@' + (profile.display_name ?? profile.name ?? pubkey),
                     style: TextStyle(
                         fontSize: 16,
                         color: Colors.white,

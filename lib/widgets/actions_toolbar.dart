@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
-import 'package:ndk/ndk.dart';
+import 'package:freeflow/metadata.dart';
+import 'package:nostr_sdk/nostr_sdk.dart';
 
 class ActionsToolbar extends StatelessWidget {
   // Full dimensions of an action
@@ -31,7 +32,7 @@ class ActionsToolbar extends StatelessWidget {
     return Container(
       width: ActionWidgetSize,
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        _getFollowAction(user),
+        _getFollowAction(video.user, user),
         _getSocialAction(icon: "heart", kind: 7),
         _getSocialAction(icon: "comment", kind: 1111),
         _getSocialAction(icon: "reply", kind: 0, title: 'Share')
@@ -49,12 +50,14 @@ class ActionsToolbar extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(top: 8),
             child: FutureBuilder(
-                future: ndk.requests.query(filters: [
-                  Filter(kinds: [kind], eTags: [video.id])
-                ]).future,
+                future: NOSTR.fetchEvents(
+                    filter: Filter()
+                        .kind(kind: kind)
+                        .event(id: EventId.parse(id: video.id)),
+                    timeout: Duration(seconds: 30)),
                 builder: (ctx, data) {
                   return Text(
-                    title ?? data.data?.length.toString() ?? "0",
+                    title ?? data.data?.len().toString() ?? "0",
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w500,
@@ -65,12 +68,13 @@ class ActionsToolbar extends StatelessWidget {
         ]));
   }
 
-  Widget _getFollowAction(Metadata profile) {
+  Widget _getFollowAction(String pubkey, Metadata profile) {
     return Container(
         margin: EdgeInsets.symmetric(vertical: 10.0),
         width: ActionWidgetSize,
         height: ActionWidgetSize,
-        child: Stack(children: [_getProfilePicture(profile), _getPlusIcon()]));
+        child: Stack(
+            children: [_getProfilePicture(pubkey, profile), _getPlusIcon()]));
   }
 
   Widget _getPlusIcon() {
@@ -91,7 +95,7 @@ class ActionsToolbar extends StatelessWidget {
     );
   }
 
-  Widget _getProfilePicture(Metadata profile) {
+  Widget _getProfilePicture(String pubkey, Metadata profile) {
     return Positioned(
         left: (ActionWidgetSize / 2) - (ProfileImageSize / 2),
         child: Container(
@@ -107,7 +111,7 @@ class ActionsToolbar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10000.0),
                 child: CachedNetworkImage(
                   imageUrl: profile.picture ??
-                      "https://nostr.api.v0l.io/api/v1/avatar/cyberpunks/${profile.pubKey}",
+                      "https://nostr.api.v0l.io/api/v1/avatar/cyberpunks/${pubkey}",
                   placeholder: (context, url) =>
                       new CircularProgressIndicator(),
                   errorWidget: (context, url, error) => new Icon(Icons.error),

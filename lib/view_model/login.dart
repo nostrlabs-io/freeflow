@@ -1,9 +1,10 @@
 import 'dart:convert';
 
+import 'package:bech32/bech32.dart';
+import 'package:bip340/bip340.dart';
+import 'package:convert/convert.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:ndk/shared/nips/nip01/bip340.dart';
-import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 enum AccountType { Keys }
 
@@ -16,10 +17,10 @@ class Account {
       {required this.type, required this.pubkey, required this.privateKey});
 
   static Account nip19(String key) {
-    final keyData = Nip19.decode(key);
-    final pubkey =
-        Nip19.isKey("nsec", key) ? Bip340.getPublicKey(keyData) : keyData;
-    final privateKey = Nip19.isKey("npub", key) ? null : keyData;
+    final data = Bech32Decoder().convert(key);
+    final hexData = hex.encode(data.data);
+    final pubkey = data.hrp == "nsec" ? getPublicKey(hexData) : hexData;
+    final privateKey = data.hrp != "nsec" ? null : hexData;
     return Account._(
         type: AccountType.Keys, pubkey: pubkey, privateKey: privateKey);
   }
@@ -28,7 +29,7 @@ class Account {
     return Account._(
         type: AccountType.Keys,
         privateKey: key,
-        pubkey: Bip340.getPublicKey(key));
+        pubkey: getPublicKey(key));
   }
 
   static Map<String, dynamic> toJson(Account? acc) => {

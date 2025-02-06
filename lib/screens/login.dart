@@ -1,8 +1,8 @@
+import 'package:bech32/bech32.dart';
 import 'package:flutter/material.dart';
 import 'package:freeflow/view_model/login.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -40,10 +40,16 @@ class _LoginScreen extends State<LoginScreen> {
                   child: TextFormField(
                       keyboardType: TextInputType.visiblePassword,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) =>
-                          (value == null || Nip19.isNip19(value))
-                              ? null
-                              : "Not a valid key",
+                      validator: (value) {
+                        try {
+                          if (value != null) {
+                            bech32.decode(value);
+                          }
+                          return null;
+                        } catch (_) {
+                          return "Not a valid key";
+                        }
+                      },
                       controller: _key,
                       decoration: InputDecoration(
                         label: Text("Nostr Key"),
@@ -53,8 +59,8 @@ class _LoginScreen extends State<LoginScreen> {
                 Expanded(
                     child: ElevatedButton(
                         onPressed: () {
-                          final keyData = Nip19.decode(_key.text);
-                          if (keyData.length > 0) {
+                          final keyData = bech32.decode(_key.text);
+                          if (keyData.data.length > 0) {
                             GetIt.I.get<LoginData>().value =
                                 Account.nip19(_key.text);
                             context.go("/");

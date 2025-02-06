@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/imgproxy.dart';
 import 'package:freeflow/main.dart';
+import 'package:freeflow/metadata.dart';
 import 'package:freeflow/view_model/feed_viewmodel.dart';
 import 'package:freeflow/view_model/login.dart';
 import 'package:freeflow/widgets/actions_toolbar.dart';
 import 'package:freeflow/widgets/profile.dart';
 import 'package:freeflow/widgets/video_description.dart';
 import 'package:get_it/get_it.dart';
-import 'package:ndk/ndk.dart';
+import 'package:nostr_sdk/nostr_sdk.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -46,8 +47,19 @@ class _FeedScreenState extends State<FeedScreen> {
                 future: () async {
                   final authors =
                       acc?.pubkey != null && _tab == FeedTab.Following
-                          ? (await ndk.follows.getContactList(acc!.pubkey))
-                              ?.contacts
+                          ? (await NOSTR.fetchEvents(
+                                  filter: Filter()
+                                      .author(
+                                          author: PublicKey.parse(
+                                              publicKey: acc!.pubkey))
+                                      .kinds(kinds: SHORT_KIND),
+                                  timeout: Duration(seconds: 30)))
+                              .first()
+                              ?.tags()
+                              .takeWhile(
+                                  (t) => t.kind() == "p" && t.content() != null)
+                              .map((t) => t.content()!)
+                              .toList()
                           : null;
                   feedViewModel.reset();
                   print(
@@ -89,11 +101,12 @@ class _FeedScreenState extends State<FeedScreen> {
               final vid = feedViewModel.currentVideo!;
               return FutureBuilder(
                   key: Key("profile-card:${vid.user}"),
-                  future: ndk.metadata.loadMetadata(vid.user),
+                  future: N.profile(vid.user),
                   builder: (ctx, data) {
                     return SafeArea(
                       child: ProfileWidget(
-                        profile: data.data ?? Metadata(pubKey: vid.user),
+                        pubkey: vid.user,
+                        profile: data.data ?? Metadata.empty(),
                       ),
                     );
                   });
@@ -198,7 +211,7 @@ class _FeedScreenState extends State<FeedScreen> {
                 ),
         ),
         FutureBuilder(
-          future: ndk.metadata.loadMetadata(video.user),
+          future: N.profile(video.user),
           builder: (state, data) => Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
@@ -206,10 +219,9 @@ class _FeedScreenState extends State<FeedScreen> {
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
-                  VideoDescription(data.data ?? Metadata(pubKey: video.user),
+                  VideoDescription(video.user, data.data ?? Metadata.empty(),
                       video.videoTitle),
-                  ActionsToolbar(
-                      video, data.data ?? Metadata(pubKey: video.user)),
+                  ActionsToolbar(video, data.data ?? Metadata.empty()),
                 ],
               ),
               SizedBox(height: 20)

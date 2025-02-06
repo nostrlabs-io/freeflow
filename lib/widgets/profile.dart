@@ -3,16 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/imgproxy.dart';
 import 'package:freeflow/main.dart';
-import 'package:ndk/ndk.dart';
+import 'package:freeflow/metadata.dart';
+import 'package:nostr_sdk/nostr_sdk.dart';
 
 class ProfileWidget extends StatelessWidget {
+  final String pubkey;
   final Metadata profile;
 
-  ProfileWidget({required this.profile}) {}
+  ProfileWidget({required this.pubkey, required this.profile}) {}
 
   @override
   Widget build(BuildContext context) {
-    final name = profile.displayName ?? profile.name ?? profile.pubKey;
+    final name = profile.display_name ?? profile.name ?? pubkey;
     return Container(
       color: Colors.white,
       child: Column(
@@ -47,7 +49,7 @@ class ProfileWidget extends StatelessWidget {
                       imageUrl: proxyImg(
                           context,
                           profile.picture ??
-                              "https://nostr.api.v0l.io/api/v1/avatar/cyberpunks/${profile.pubKey}",
+                              "https://nostr.api.v0l.io/api/v1/avatar/cyberpunks/${pubkey}",
                           resize: 100),
                       height: 100.0,
                       width: 100.0,
@@ -73,7 +75,7 @@ class ProfileWidget extends StatelessWidget {
                     Column(
                       children: [
                         FutureBuilder(
-                            future: ndk.follows.getContactList(profile.pubKey),
+                            future: N.contactList(pubkey),
                             builder: (context, data) {
                               if (!data.hasData) {
                                 return SizedBox(
@@ -83,7 +85,7 @@ class ProfileWidget extends StatelessWidget {
                                 );
                               }
                               return Text(
-                                (data.data?.contacts.length ?? 0).toString(),
+                                (data.data?.length ?? 0).toString(),
                                 style: TextStyle(
                                     fontSize: 20, fontWeight: FontWeight.bold),
                               );
@@ -130,9 +132,7 @@ class ProfileWidget extends StatelessWidget {
                     Column(
                       children: [
                         FutureBuilder(
-                            future: ndk.zaps
-                                .fetchZappedReceipts(pubKey: profile.pubKey)
-                                .toList(),
+                            future: N.zapReceipts(pubkey),
                             builder: (context, data) {
                               if (!data.hasData) {
                                 return SizedBox(
@@ -142,10 +142,8 @@ class ProfileWidget extends StatelessWidget {
                                 );
                               }
                               return Text(
-                                formatSats(data.data?.fold(
-                                        0,
-                                        (acc, v) =>
-                                            acc! + (v.amountSats ?? 0)) ??
+                                formatSats(data.data?.fold(0,
+                                        (acc, v) => acc! + (v.amount ?? 0)) ??
                                     0),
                                 style: TextStyle(
                                     fontSize: 20, fontWeight: FontWeight.bold),
@@ -224,27 +222,26 @@ class ProfileWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-                StreamBuilder(
-                    stream: ndk.requests
-                        .query(filters: [
-                          Filter(
-                              kinds: SHORT_KIND,
-                              authors: [profile.pubKey],
-                              limit: 10)
-                        ])
-                        .future
-                        .asStream(),
+                FutureBuilder(
+                    key: Key(pubkey),
+                    future: NOSTR.fetchEvents(
+                      filter: Filter()
+                          .kinds(kinds: SHORT_KIND)
+                          .author(author: PublicKey.parse(publicKey: pubkey))
+                          .limit(limit: BigInt.from(10)),
+                      timeout: Duration(seconds: 30),
+                    ),
                     builder: (ctx, snapshot) {
                       if (snapshot.hasData) {
                         return GridView.builder(
                             shrinkWrap: true,
-                            itemCount: snapshot.data!.length,
+                            itemCount: snapshot.data!.len().toInt(),
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 3),
                             itemBuilder: (ctx, idx) {
-                              return _profileTile(
-                                  ctx, Video.fromEvent(snapshot.data![idx]));
+                              return _profileTile(ctx,
+                                  Video.fromEvent(snapshot.data!.asVec()[idx]));
                             });
                       } else {
                         return CircularProgressIndicator();

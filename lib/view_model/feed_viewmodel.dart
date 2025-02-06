@@ -1,6 +1,6 @@
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
-import 'package:ndk/domain_layer/entities/filter.dart';
+import 'package:nostr_sdk/nostr_sdk.dart';
 import 'package:video_player/video_player.dart';
 
 class FeedViewModel {
@@ -68,11 +68,16 @@ class FeedViewModel {
 
   Future<List<Video>> loadVideoData(List<String>? authors) async {
     if (videos.length == 0) {
-      final response = ndk.requests.query(filters: [
-        Filter(kinds: SHORT_KIND, limit: 20, authors: authors)
-      ]);
-      videos =
-          await response.stream.asyncMap((e) => Video.fromEvent(e)).toList();
+      var filter =
+          Filter().kinds(kinds: SHORT_KIND).limit(limit: BigInt.from(20));
+      if (authors != null) {
+        filter.authors(
+            authors:
+                authors.map((a) => PublicKey.parse(publicKey: a)).toList());
+      }
+      final response = await NOSTR.fetchEvents(
+          filter: filter, timeout: Duration(seconds: 30));
+      videos = response.toVec().map((e) => Video.fromEvent(e)).toList();
     }
     return videos;
   }

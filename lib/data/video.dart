@@ -1,8 +1,8 @@
 import 'package:freeflow/data/imeta.dart';
-import 'package:ndk/ndk.dart';
+import 'package:nostr_sdk/nostr_sdk.dart';
 
 class Video {
-  Nip01Event event;
+  Event event;
   List<IMeta> metadata;
 
   String? get url {
@@ -24,15 +24,15 @@ class Video {
   }
 
   String get id {
-    return event.id;
+    return event.id().toHex();
   }
 
   String get user {
-    return event.pubKey;
+    return event.author().toHex();
   }
 
   String get videoTitle {
-    return event.content;
+    return event.content();
   }
 
   int get likes {
@@ -45,7 +45,7 @@ class Video {
 
   Video({required this.event, required this.metadata}) {}
 
-  static Video fromEvent(Nip01Event event) {
+  static Video fromEvent(Event event) {
     return Video(event: event, metadata: IMeta.fromEvent(event));
   }
 }
