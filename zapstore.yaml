@@ -1,0 +1,15 @@
+freeflow:
+  android:
+    identifier: io.nostrlabs.freeflow
+    name: Freeflow
+    summary: A TikTok Clone in Flutter and nostr
+    repository: https://github.com/nostrlabs-io/freeflow
+    license: MIT
+    builder: npub1v0lxxxxutpvrelsksy8cdhgfux9l6a42hsj2qzquu2zk7vc9qnkszrqj49
+    artifacts:
+      app-armeabi-v7a-release.apk:
+        platform: armeabi-v7a
+      app-arm64-v8a-release.apk:
+        platform: arm64-v8a
+      app-x86_64-release.apk:
+        platform: x86_64
