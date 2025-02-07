@@ -70,7 +70,7 @@ Future<void> main() async {
     routerConfig: GoRouter(routes: [
       StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) =>
-              LayoutScreen(navigationShell),
+              SafeArea(child: LayoutScreen(navigationShell), top: false),
           branches: [
             StatefulShellBranch(routes: [
               GoRoute(path: "/", builder: (context, state) => FeedScreen()),
