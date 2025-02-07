@@ -16,6 +16,7 @@ dependencies:
   cached_network_image: ^3.4.1
   ndk: ^0.2.6
   ndk_objectbox: ^0.2.0
+  ndk_rust_verifier: ^0.2.1
   go_router: ^14.6.3
   flutter_secure_storage: ^9.2.4
   flutter_svg: ^2.0.17
