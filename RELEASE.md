@@ -8,5 +8,5 @@ Install required software:
 
 Then publish the release
 
-1. `zapstore publish albygo -v <version>` (<version> without the `v` prefix)
+1. `zapstore publish freeflow -v <version>` (<version> without the `v` prefix)
 1. Use nsec to sign release events
