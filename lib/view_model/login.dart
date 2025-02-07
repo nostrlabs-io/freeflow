@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip01/bip340.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 
@@ -24,7 +25,7 @@ class Account {
         type: AccountType.Keys, pubkey: pubkey, privateKey: privateKey);
   }
 
-  static Account nsec(String key) {
+  static Account privateKeyHex(String key) {
     return Account._(
         type: AccountType.Keys,
         privateKey: key,
@@ -45,6 +46,10 @@ class Account {
           privateKey: json["privateKey"]);
     }
     return null;
+  }
+
+  EventSigner signer() {
+    return Bip340EventSigner(privateKey: privateKey, publicKey: pubkey);
   }
 }
 

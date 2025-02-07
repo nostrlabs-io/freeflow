@@ -543,10 +543,10 @@ packages:
     dependency: "direct main"
     description:
       name: ndk
-      sha256: "9caa6c06ced76bf0499513f648102f9fa0e58bebf02a87568ce31f41db38c3e1"
+      sha256: a299ce4f2bc8f1ecb67b87f552f6d793a44ec63a5cb0f4703a8558f1bbd62950
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.5"
+    version: "0.2.6"
   ndk_objectbox:
     dependency: "direct main"
     description:
@@ -856,6 +856,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
+  video_compress:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: a8123f2054d28b32b84a2ba0601fdcfe78b581b2
+      url: "https://github.com/nostrlabs-io/VideoCompress.git"
+    source: git
+    version: "3.1.4"
   video_player:
     dependency: "direct main"
     description:

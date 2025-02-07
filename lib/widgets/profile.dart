@@ -4,6 +4,7 @@ import 'package:freeflow/data/video.dart';
 import 'package:freeflow/imgproxy.dart';
 import 'package:freeflow/main.dart';
 import 'package:ndk/ndk.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 class ProfileWidget extends StatelessWidget {
   final Metadata profile;
@@ -12,7 +13,9 @@ class ProfileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = profile.displayName ?? profile.name ?? profile.pubKey;
+    final name = profile.displayName ??
+        profile.name ??
+        Nip19.encodeSimplePubKey(profile.pubKey);
     return Container(
       color: Colors.white,
       child: Column(

@@ -21,7 +21,10 @@ class BasicButton extends StatelessWidget {
       Text(
         text,
         style: TextStyle(
-            color: Color.fromARGB(255, 255, 255, 255), fontSize: fontSize),
+          color: Color.fromARGB(255, 255, 255, 255),
+          fontSize: fontSize,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       decoration: decoration,
       padding: padding,

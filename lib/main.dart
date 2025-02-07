@@ -15,6 +15,29 @@ import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
 
+class NoVerify extends EventVerifier {
+  @override
+  Future<bool> verify(Nip01Event event) {
+    return Future.value(true);
+  }
+}
+
+final ndk_cache = DbObjectBox();
+var ndk = Ndk(
+  NdkConfig(
+    eventVerifier: NoVerify(),
+    cache: ndk_cache,
+  ),
+);
+
+final SHORT_KIND = [22, 34236];
+final USER_AGENT = "freeflow/1.0";
+const DEFAULT_RELAYS = [
+  "wss://nos.lol",
+  "wss://relay.damus.io",
+  "wss://relay.primal.net"
+];
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -22,8 +45,18 @@ Future<void> main() async {
 
   // reload / cache login data
   l.addListener(() {
-    ndk.metadata.loadMetadata(l.value!.pubkey);
-    ndk.follows.getContactList(l.value!.pubkey);
+    if (l.value != null) {
+      ndk = Ndk(
+        NdkConfig(
+          cache: ndk_cache,
+          eventVerifier: NoVerify(),
+          eventSigner: l.value!.signer(),
+          bootstrapRelays: DEFAULT_RELAYS
+        ),
+      );
+      ndk.metadata.loadMetadata(l.value!.pubkey);
+      ndk.follows.getContactList(l.value!.pubkey);
+    }
   });
 
   await l.load();
@@ -74,23 +107,6 @@ Future<void> main() async {
     ]),
   ));
 }
-
-class NoVerify extends EventVerifier {
-  @override
-  Future<bool> verify(Nip01Event event) {
-    return Future.value(true);
-  }
-}
-
-final ndk = Ndk(
-  NdkConfig(
-    eventVerifier: NoVerify(),
-    cache: DbObjectBox(),
-  ),
-);
-
-final SHORT_KIND = [22, 34236];
-final USER_AGENT = "freeflow/1.0";
 
 String formatSats(int n) {
   if (n > 1000000) {
