@@ -20,8 +20,9 @@ class RecordingSegment {
 
 class _CreateShortScreen extends State<CreateShortScreen> {
   CameraController? controller;
-  int camera = 1;
+  int camera = -1;
   CameraDescription? current_camera;
+  List<CameraDescription> cameras = List.empty();
   int recording_start = 0;
   List<RecordingSegment> clips = List.empty();
 
@@ -29,6 +30,12 @@ class _CreateShortScreen extends State<CreateShortScreen> {
   void initState() {
     super.initState();
     WakelockPlus.enable();
+    availableCameras().then((c) {
+      setState(() {
+        cameras = c;
+      });
+      _cycleCamera();
+    });
   }
 
   @override
@@ -37,70 +44,78 @@ class _CreateShortScreen extends State<CreateShortScreen> {
     WakelockPlus.disable();
   }
 
+  void _cycleCamera() {
+    if (cameras.length > 0)
+      setState(() {
+        camera = camera + 1;
+        current_camera = cameras[camera % cameras.length];
+        if (controller != null) {
+          controller!.dispose();
+          controller = null;
+        }
+        controller = CameraController(current_camera!, ResolutionPreset.high);
+        controller!.initialize().then((_) {
+          setState(() {});
+        });
+      });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: FutureBuilder(future: () async {
-        final cams = await availableCameras();
-        if (current_camera == null) {
-          final cam = cams[camera];
-          print("Using camera: ${cam.name}");
-          controller = CameraController(cams[camera], ResolutionPreset.high);
-          await controller!.initialize();
-          setState(() {
-            current_camera = cam;
-          });
-        }
-      }(), builder: (ctx, data) {
-        return Container(
-          color: Color.fromARGB(255, 0, 0, 0),
-          child: (controller?.value.isInitialized ?? false)
-              ? SizedBox.expand(
-                  child: ValueListenableBuilder(
-                    valueListenable: controller!,
-                    child: Container(
-                      padding: EdgeInsets.only(bottom: 15),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Stack(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  BasicButton.text(
-                                    "Next",
-                                    onTap: () =>
-                                        ctx.go("/create/preview", extra: clips),
-                                    fontSize: 16,
-                                    margin: EdgeInsets.only(right: 5),
-                                  )
-                                ],
-                              ),
-                              Center(child: _recordButton(context)),
-                            ],
-                          )
-                        ],
-                      ),
+      child: Container(
+        color: Color.fromARGB(255, 0, 0, 0),
+        child: (controller?.value.isInitialized ?? false)
+            ? SizedBox.expand(
+                child: ValueListenableBuilder(
+                  valueListenable: controller!,
+                  child: Container(
+                    padding: EdgeInsets.only(bottom: 15),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Stack(
+                          children: [
+                            IconButton.filled(
+                              color: Color.fromARGB(255, 255, 255, 255),
+                              onPressed: () => _cycleCamera(),
+                              icon: Icon(Icons.cameraswitch),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                BasicButton.text(
+                                  "Next",
+                                  onTap: () =>
+                                      context.go("/create/preview", extra: clips),
+                                  fontSize: 16,
+                                  margin: EdgeInsets.only(right: 5),
+                                ),
+                              ],
+                            ),
+                            Center(child: _recordButton(context)),
+                          ],
+                        )
+                      ],
                     ),
-                    builder: (ctx, data, child) {
-                      return Stack(
-                        children: [
-                          RotatedBox(
-                            quarterTurns:
-                                ((current_camera?.sensorOrientation ?? 0) / 90)
-                                    .floor(),
-                            child: controller!.buildPreview(),
-                          ),
-                          child!
-                        ],
-                      );
-                    },
                   ),
-                )
-              : null,
-        );
-      }),
+                  builder: (ctx, data, child) {
+                    return Stack(
+                      children: [
+                        RotatedBox(
+                          quarterTurns:
+                              ((current_camera?.sensorOrientation ?? 0) / 90)
+                                  .floor(),
+                          child: controller!.buildPreview(),
+                        ),
+                        child!
+                      ],
+                    );
+                  },
+                ),
+              )
+            : null,
+      ),
     );
   }
 

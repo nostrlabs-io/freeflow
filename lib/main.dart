@@ -30,7 +30,7 @@ var ndk = Ndk(
   ),
 );
 
-final SHORT_KIND = [22, 34236];
+final SHORT_KIND = [22];
 final USER_AGENT = "freeflow/1.0";
 const DEFAULT_RELAYS = [
   "wss://nos.lol",
