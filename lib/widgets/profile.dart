@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/imgproxy.dart';
 import 'package:freeflow/main.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 
@@ -262,19 +263,23 @@ class ProfileWidget extends StatelessWidget {
   }
 
   Widget _profileTile(BuildContext context, Video v) {
-    return Container(
-      height: 160,
-      decoration: BoxDecoration(
-          color: Colors.black26,
-          border: Border.all(color: Colors.white70, width: .5)),
-      child: CachedNetworkImage(
-        fit: BoxFit.contain,
-        imageUrl: proxyImg(context, v.image ?? v.url ?? "", resize: 160),
-        placeholder: (context, url) => Padding(
-          padding: const EdgeInsets.all(35.0),
-          child: CircularProgressIndicator(),
+    return GestureDetector(
+      onTap: () {
+        context.go("/e/${Nip19.encodeNoteId(v.id)}", extra: v.event);
+      },
+      child: Container(
+        height: 160,
+        decoration: BoxDecoration(
+            color: Colors.black26,
+            border: Border.all(color: Colors.white70, width: .5)),
+        child: CachedNetworkImage(
+          fit: BoxFit.contain,
+          imageUrl: proxyImg(context, v.image ?? v.url ?? "", resize: 160),
+          placeholder: (context, url) => Center(
+            child: CircularProgressIndicator(),
+          ),
+          errorWidget: (context, url, error) => Icon(Icons.error),
         ),
-        errorWidget: (context, url, error) => Icon(Icons.error),
       ),
     );
   }

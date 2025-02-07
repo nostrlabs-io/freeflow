@@ -1,16 +1,12 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
-import 'package:freeflow/imgproxy.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/view_model/feed_viewmodel.dart';
 import 'package:freeflow/view_model/login.dart';
-import 'package:freeflow/widgets/actions_toolbar.dart';
 import 'package:freeflow/widgets/profile.dart';
-import 'package:freeflow/widgets/video_description.dart';
+import 'package:freeflow/widgets/short_video.dart';
 import 'package:get_it/get_it.dart';
 import 'package:ndk/ndk.dart';
-import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 class FeedScreen extends StatefulWidget {
@@ -78,7 +74,10 @@ class _FeedScreenState extends State<FeedScreen> {
                             if (vid == null) {
                               return SizedBox.shrink();
                             } else {
-                              return videoCard(context, vid, data.data);
+                              return ShortVideoPlayer(
+                                vid,
+                                controller: data.data,
+                              );
                             }
                           });
                     },
@@ -159,63 +158,6 @@ class _FeedScreenState extends State<FeedScreen> {
             ),
           ),
         ),
-      ],
-    );
-  }
-
-  Widget videoCard(
-      BuildContext context, Video video, VideoPlayerController? controller) {
-    return Stack(
-      children: [
-        GestureDetector(
-          onTap: () {
-            if (controller != null) {
-              if (controller.value.isPlaying) {
-                controller.pause();
-              } else {
-                controller.play();
-              }
-            }
-          },
-          child: controller != null
-              ? SizedBox.expand(
-                  child: FittedBox(
-                  fit: BoxFit.cover,
-                  child: SizedBox(
-                    width: controller.value.size.width,
-                    height: controller.value.size.height,
-                    child: VideoPlayer(controller),
-                  ),
-                ))
-              : SizedBox.expand(
-                  child: FittedBox(
-                    fit: BoxFit.cover,
-                    child: CachedNetworkImage(
-                      imageUrl:
-                          proxyImg(context, video.image ?? video.url ?? ""),
-                    ),
-                  ),
-                ),
-        ),
-        FutureBuilder(
-          future: ndk.metadata.loadMetadata(video.user),
-          builder: (state, data) => Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              Row(
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  VideoDescription(data.data ?? Metadata(pubKey: video.user),
-                      video.videoTitle),
-                  ActionsToolbar(
-                      video, data.data ?? Metadata(pubKey: video.user)),
-                ],
-              ),
-              SizedBox(height: 20)
-            ],
-          ),
-        )
       ],
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:freeflow/data/video.dart';
 import 'package:freeflow/screens/create.dart';
 import 'package:freeflow/screens/create_preview.dart';
 import 'package:freeflow/screens/feed_screen.dart';
@@ -10,9 +11,11 @@ import 'package:freeflow/screens/profile_screen.dart';
 import 'package:freeflow/screens/search_screen.dart';
 import 'package:freeflow/view_model/feed_viewmodel.dart';
 import 'package:freeflow/view_model/login.dart';
+import 'package:freeflow/widgets/short_video.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
 
 class NoVerify extends EventVerifier {
@@ -48,11 +51,10 @@ Future<void> main() async {
     if (l.value != null) {
       ndk = Ndk(
         NdkConfig(
-          cache: ndk_cache,
-          eventVerifier: NoVerify(),
-          eventSigner: l.value!.signer(),
-          bootstrapRelays: DEFAULT_RELAYS
-        ),
+            cache: ndk_cache,
+            eventVerifier: NoVerify(),
+            eventSigner: l.value!.signer(),
+            bootstrapRelays: DEFAULT_RELAYS),
       );
       ndk.metadata.loadMetadata(l.value!.pubkey);
       ndk.follows.getContactList(l.value!.pubkey);
@@ -101,7 +103,39 @@ Future<void> main() async {
                       path: "new",
                       builder: (context, state) => NewAccountScreen(),
                     )
-                  ])
+                  ]),
+              GoRoute(
+                path: "/e/:id",
+                builder: (ctx, state) {
+                  if (state.extra is Nip01Event) {
+                    return ShortVideoPlayer(
+                        Video.fromEvent(state.extra as Nip01Event));
+                  } else {
+                    return FutureBuilder(
+                      future: ndk.requests.query(
+                        filters: [
+                          Filter(
+                            ids: [Nip19.decode(state.pathParameters["id"]!)],
+                          ),
+                        ],
+                        timeout: Duration(seconds: 30),
+                      ).future,
+                      builder: (ctx, data) {
+                        final ev = (data.data?.length ?? 0) > 0
+                            ? data.data!.first
+                            : null;
+                        if (ev != null) {
+                          return ShortVideoPlayer(Video.fromEvent(ev));
+                        } else {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                      },
+                    );
+                  }
+                },
+              )
             ]),
           ]),
     ]),
