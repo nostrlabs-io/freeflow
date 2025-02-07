@@ -4,6 +4,7 @@ import 'package:freeflow/widgets/button.dart';
 import 'package:freeflow/widgets/record_button.dart';
 import 'package:freeflow/widgets/timer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class CreateShortScreen extends StatefulWidget {
   @override
@@ -20,59 +21,86 @@ class RecordingSegment {
 class _CreateShortScreen extends State<CreateShortScreen> {
   CameraController? controller;
   int camera = 1;
+  CameraDescription? current_camera;
   int recording_start = 0;
   List<RecordingSegment> clips = List.empty();
 
   @override
+  void initState() {
+    super.initState();
+    WakelockPlus.enable();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WakelockPlus.disable();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: FutureBuilder(
-          key: Key("camera-${camera}"),
-          future: () async {
-            final cams = await availableCameras();
-            if (controller == null) {
-              controller = CameraController(cams[camera], ResolutionPreset.high,
-                  fps: 30);
-              await controller!.initialize();
-            }
-          }(),
-          builder: (ctx, data) {
-            return Container(
-              color: Color.fromARGB(255, 0, 0, 0),
-              child: controller != null
-                  ? SizedBox.expand(
-                      child: CameraPreview(
-                        controller!,
-                        child: Container(
-                          padding: EdgeInsets.only(bottom: 15),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
+      child: FutureBuilder(future: () async {
+        final cams = await availableCameras();
+        if (current_camera == null) {
+          final cam = cams[camera];
+          print("Using camera: ${cam.name}");
+          controller = CameraController(cams[camera], ResolutionPreset.high);
+          await controller!.initialize();
+          setState(() {
+            current_camera = cam;
+          });
+        }
+      }(), builder: (ctx, data) {
+        return Container(
+          color: Color.fromARGB(255, 0, 0, 0),
+          child: (controller?.value.isInitialized ?? false)
+              ? SizedBox.expand(
+                  child: ValueListenableBuilder(
+                    valueListenable: controller!,
+                    child: Container(
+                      padding: EdgeInsets.only(bottom: 15),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Stack(
                             children: [
-                              Stack(
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      BasicButton.text(
-                                        "Next",
-                                        onTap: () => ctx.go("/create/preview",
-                                            extra: clips),
-                                        fontSize: 16,
-                                        margin: EdgeInsets.only(right: 5),
-                                      )
-                                    ],
-                                  ),
-                                  Center(child: _recordButton(context)),
+                                  BasicButton.text(
+                                    "Next",
+                                    onTap: () =>
+                                        ctx.go("/create/preview", extra: clips),
+                                    fontSize: 16,
+                                    margin: EdgeInsets.only(right: 5),
+                                  )
                                 ],
-                              )
+                              ),
+                              Center(child: _recordButton(context)),
                             ],
-                          ),
-                        ),
+                          )
+                        ],
                       ),
-                    )
-                  : null,
-            );
-          }),
+                    ),
+                    builder: (ctx, data, child) {
+                      return Stack(
+                        children: [
+                          RotatedBox(
+                            quarterTurns:
+                                ((current_camera?.sensorOrientation ?? 0) / 90)
+                                    .floor(),
+                            child: controller!.buildPreview(),
+                          ),
+                          child!
+                        ],
+                      );
+                    },
+                  ),
+                )
+              : null,
+        );
+      }),
     );
   }
 
