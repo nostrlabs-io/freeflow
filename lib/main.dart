@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/screens/create.dart';
@@ -17,6 +18,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:ndk_objectbox/ndk_objectbox.dart';
+import 'package:ndk_rust_verifier/data_layer/repositories/verifiers/rust_event_verifier.dart';
 
 class NoVerify extends EventVerifier {
   @override
@@ -26,9 +28,10 @@ class NoVerify extends EventVerifier {
 }
 
 final ndk_cache = DbObjectBox();
+final eventVerifier = kDebugMode? NoVerify(): RustEventVerifier();
 var ndk = Ndk(
   NdkConfig(
-    eventVerifier: NoVerify(),
+    eventVerifier: eventVerifier,
     cache: ndk_cache,
   ),
 );
@@ -52,7 +55,7 @@ Future<void> main() async {
       ndk = Ndk(
         NdkConfig(
             cache: ndk_cache,
-            eventVerifier: NoVerify(),
+            eventVerifier: eventVerifier,
             eventSigner: l.value!.signer(),
             bootstrapRelays: DEFAULT_RELAYS),
       );
