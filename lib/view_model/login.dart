@@ -64,6 +64,7 @@ class Account {
       case AccountType.ExternalSigner:
         return AmberEventSigner(publicKey: pubkey, amberFlutterDS: AmberFlutterDS(Amberflutter()));
     }
+    // ignore: dead_code
     throw UnimplementedError();
   }
 }

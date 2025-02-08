@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:amberflutter/amberflutter.dart';
@@ -8,9 +7,6 @@ import 'package:freeflow/widgets/button.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import '../main.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -92,31 +88,39 @@ class _LoginScreen extends State<LoginScreen> {
               SizedBox(
                 height: 20,
               ),
-              Row(children: [
-                Expanded(
-                  child: BasicButton.text(
-                    "Login with external signer",
-                    fontSize: 16,
-                    onTap: () async {
-                      final amber = Amberflutter();
-                      if (Platform.isAndroid && await amber.isAppInstalled()) {
-                        final result = await amber.getPublicKey();
-                        if (result['signature'] != null) {
-                          final key = Nip19.decode(result['signature']);
-                          GetIt.I.get<LoginData>().value =
-                              Account.externalPublicKeyHex(key);
-                          context.go("/");
-                        }
-                      } else {
-                        var url = Uri.parse(
-                        "https://github.com/greenart7c3/Amber");
-                        launchUrl(url,
-                        mode: LaunchMode.externalApplication);
-                      }
-                    },
-                  ),
-                ),
-              ]),
+              FutureBuilder(future: (() async {
+                final amber = Amberflutter();
+                if (Platform.isAndroid && await amber.isAppInstalled()) {
+                  return true;
+                } else {
+                  return false;
+                }
+              })(), builder: (ctx, state) {
+                if (state.data ?? false) {
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: BasicButton.text(
+                          "Login with Android Signer",
+                          fontSize: 16,
+                          onTap: () async {
+                            final amber = Amberflutter();
+                            final result = await amber.getPublicKey();
+                            if (result['signature'] != null) {
+                              final key = Nip19.decode(result['signature']);
+                              GetIt.I.get<LoginData>().value =
+                                  Account.externalPublicKeyHex(key);
+                              context.go("/");
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return SizedBox.shrink();
+                }
+              }),
               SizedBox(
                 height: 20,
               ),
