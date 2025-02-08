@@ -9,8 +9,6 @@ import 'package:ndk/shared/nips/nip19/nip19.dart';
 import 'package:ndk_amber/data_layer/data_sources/amber_flutter.dart';
 import 'package:ndk_amber/data_layer/repositories/signers/amber_event_signer.dart';
 
-import '../main.dart';
-
 enum AccountType { Keys, ExternalSigner }
 
 class Account {
