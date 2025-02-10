@@ -95,11 +95,10 @@ class _NewAccountScreen extends State<NewAccountScreen> {
           pubkey: _privateKey.publicKey, privkey: _privateKey.privateKey!);
     }
 
-    ndk.metadata.broadcastMetadata(Metadata(
+    await ndk.metadata.broadcastMetadata(Metadata(
       pubKey: _privateKey.publicKey,
       name: _name.text,
       picture: _avatar,
-    ),
-    specificRelays: DEFAULT_BOOTSTRAP_RELAYS);
+    ));
   }
 }

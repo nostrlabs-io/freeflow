@@ -55,15 +55,19 @@ Future<void> main() async {
   // reload / cache login data
   l.addListener(() {
     if (l.value != null) {
-      switch (l.value!.type) {
-        case AccountType.privateKey:
-          ndk.accounts.loginPrivateKey(pubkey: l.value!.pubkey, privkey: l.value!.privateKey!);
-        case AccountType.externalSigner:
-          ndk.accounts.loginExternalSigner(
-              signer: AmberEventSigner(publicKey: l.value!.pubkey, amberFlutterDS: AmberFlutterDS(Amberflutter()))
-          );
-        case AccountType.publicKey:
-          ndk.accounts.loginPublicKey(pubkey: l.value!.pubkey);
+      if (!ndk.accounts.hasAccount(l.value!.pubkey)) {
+        switch (l.value!.type) {
+          case AccountType.privateKey:
+            ndk.accounts.loginPrivateKey(
+                pubkey: l.value!.pubkey, privkey: l.value!.privateKey!);
+          case AccountType.externalSigner:
+            ndk.accounts.loginExternalSigner(
+                signer: AmberEventSigner(publicKey: l.value!.pubkey,
+                    amberFlutterDS: AmberFlutterDS(Amberflutter()))
+            );
+          case AccountType.publicKey:
+            ndk.accounts.loginPublicKey(pubkey: l.value!.pubkey);
+        }
       }
       ndk.metadata.loadMetadata(l.value!.pubkey);
       ndk.follows.getContactList(l.value!.pubkey);
