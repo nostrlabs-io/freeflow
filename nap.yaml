@@ -1,0 +1,11 @@
+id: "io.nostrlabs.freeflow"
+name: "Freeflow"
+description: "Live in the moment"
+icon: "https://freeflow.app/icon.png"
+images:
+  - "https://freeflow.app/banner.jpg"
+repository: "https://github.com/nostrlabs-io/freeflow"
+license: "MIT"
+tags:
+  - "tiktok"
+  - "shorts"
