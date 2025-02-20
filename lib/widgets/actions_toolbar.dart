@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
+import 'package:freeflow/widgets/avatar.dart';
 import 'package:freeflow/widgets/comments.dart';
 import 'package:ndk/ndk.dart';
 
@@ -119,24 +119,17 @@ class ActionsToolbar extends StatelessWidget {
 
   Widget _getProfilePicture(Metadata profile) {
     return Positioned(
-        left: (ActionWidgetSize / 2) - (ProfileImageSize / 2),
-        child: Container(
-            padding:
-                EdgeInsets.all(1.0), // Add 1.0 point padding to create border
-            height: ProfileImageSize, // ProfileImageSize = 50.0;
-            width: ProfileImageSize, // ProfileImageSize = 50.0;
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(ProfileImageSize / 2)),
-            // import 'package:cached_network_image/cached_network_image.dart'; at the top to use CachedNetworkImage
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(10000.0),
-                child: CachedNetworkImage(
-                  imageUrl: profile.picture ??
-                      "https://nostr.api.v0l.io/api/v1/avatar/cyberpunks/${profile.pubKey}",
-                  placeholder: (context, url) =>
-                      new CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => new Icon(Icons.error),
-                ))));
+      left: (ActionWidgetSize / 2) - (ProfileImageSize / 2),
+      child: Container(
+        padding: EdgeInsets.all(1.0), // Add 1.0 point padding to create border
+        height: ProfileImageSize, // ProfileImageSize = 50.0;
+        width: ProfileImageSize, // ProfileImageSize = 50.0;
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(ProfileImageSize / 2),
+        ),
+        child: AvatarWidget(profile: profile),
+      ),
+    );
   }
 }

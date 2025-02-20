@@ -11,8 +11,7 @@ class Account {
   final String pubkey;
   final String? privateKey;
 
-  Account._(
-      {required this.type, required this.pubkey, this.privateKey});
+  Account._({required this.type, required this.pubkey, this.privateKey});
 
   static Account nip19(String key) {
     final keyData = Nip19.decode(key);
@@ -31,9 +30,7 @@ class Account {
   }
 
   static Account externalPublicKeyHex(String key) {
-    return Account._(
-        type: AccountType.externalSigner,
-        pubkey: key);
+    return Account._(type: AccountType.externalSigner, pubkey: key);
   }
 
   static Map<String, dynamic> toJson(Account? acc) => {
@@ -45,7 +42,8 @@ class Account {
   static Account? fromJson(Map<String, dynamic> json) {
     if (json.length > 2 && json.containsKey("pubKey")) {
       return Account._(
-          type: AccountType.privateKey,
+          type: AccountType.values
+              .firstWhere((v) => v.toString().endsWith(json["type"] as String)),
           pubkey: json["pubKey"],
           privateKey: json["privateKey"]);
     }

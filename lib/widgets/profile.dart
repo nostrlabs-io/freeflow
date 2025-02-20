@@ -4,6 +4,7 @@ import 'package:freeflow/data/video.dart';
 import 'package:freeflow/imgproxy.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/widgets/avatar.dart';
+import 'package:freeflow/widgets/profile_name.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
@@ -15,9 +16,6 @@ class ProfileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = profile.displayName ??
-        profile.name ??
-        Nip19.encodeSimplePubKey(profile.pubKey);
     return Container(
       color: Colors.white,
       child: Column(
@@ -30,8 +28,8 @@ class ProfileWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Icon(Icons.person_add_alt_1_outlined),
-                Text(
-                  name,
+                ProfileNameWidget(
+                  profile: profile,
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                 ),
                 Icon(Icons.more_horiz)
@@ -50,13 +48,6 @@ class ProfileWidget extends StatelessWidget {
                   profile: profile,
                   size: 100,
                 )),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  "@" + name,
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
                 SizedBox(
                   height: 20,
                 ),

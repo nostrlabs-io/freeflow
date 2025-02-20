@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
-import 'package:freeflow/view_model/login.dart';
+import 'package:freeflow/theme.dart';
 import 'package:freeflow/widgets/avatar.dart';
 import 'package:freeflow/widgets/button.dart';
-import 'package:get_it/get_it.dart';
+import 'package:freeflow/widgets/profile_name.dart';
 import 'package:ndk/ndk.dart';
 
 class CommentsWidget extends StatefulWidget {
@@ -67,17 +68,65 @@ class _CommentsWidget extends State<CommentsWidget> {
   }
 
   Widget _commentWidget(Nip01Event ev) {
+    final createdDate =
+        DateTime.fromMillisecondsSinceEpoch(ev.createdAt * 1000);
     return Row(
       spacing: 10,
       children: [
         AvatarWidget.pubkey(ev.pubKey),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Username"),
-            Text(ev.content),
-          ],
-        )
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ProfileNameWidget.pubkey(
+                ev.pubKey,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: NEUTRAL_500,
+                ),
+              ),
+              Text(ev.content),
+              SizedBox(height: 5),
+              Row(
+                spacing: 5,
+                children: [
+                  Text(
+                    "${createdDate.year}-${createdDate.month}-${createdDate.day}",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: NEUTRAL_500,
+                    ),
+                  ),
+                  Text(
+                    "Reply",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: NEUTRAL_500,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(3),
+                          child: SvgPicture.asset(
+                            "assets/svg/heart.svg",
+                            height: 14,
+                            width: 14,
+                            colorFilter: ColorFilter.mode(
+                                NEUTRAL_500, BlendMode.srcATop),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
