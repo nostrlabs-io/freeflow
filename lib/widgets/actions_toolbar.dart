@@ -4,6 +4,7 @@ import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/widgets/avatar.dart';
 import 'package:freeflow/widgets/comments.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
 
 class ActionsToolbar extends StatelessWidget {
@@ -38,12 +39,18 @@ class ActionsToolbar extends StatelessWidget {
           _getFollowAction(user),
           _getSocialAction(
               icon: "heart",
+              activeColor: Colors.red,
               kind: 7,
               onPressed: () {
+                if (ndk.accounts.isNotLoggedIn) {
+                  context.go("/login");
+                  return;
+                }
                 ndk.broadcast.broadcastReaction(eventId: video.id);
               }),
           _getSocialAction(
               icon: "comment",
+              activeColor: Colors.blueAccent,
               kind: 1111,
               onPressed: () {
                 showModalBottomSheet(
@@ -51,7 +58,12 @@ class ActionsToolbar extends StatelessWidget {
                     constraints: BoxConstraints.expand(),
                     builder: (context) => CommentsWidget(video: video));
               }),
-          _getSocialAction(icon: "zap", kind: 9735, title: 'Zap')
+          _getSocialAction(
+            icon: "zap",
+            activeColor: Colors.red,
+            kind: 9735,
+            title: 'Zap',
+          )
         ],
       ),
     );
@@ -60,32 +72,40 @@ class ActionsToolbar extends StatelessWidget {
   Widget _getSocialAction(
       {required String icon,
       required int kind,
+      required Color activeColor,
       String? title,
       void Function()? onPressed}) {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
         width: ActionWidgetSize,
-        child: Column(
-          children: [
-            SvgPicture.asset("assets/svg/${icon}.svg"),
-            Padding(
-              padding: EdgeInsets.only(top: 8),
-              child: FutureBuilder(
-                  future: ndk.requests.query(filters: [
-                    Filter(kinds: [kind], eTags: [video.id])
-                  ]).future,
-                  builder: (ctx, data) {
-                    return Text(
+        child: FutureBuilder(
+          future: ndk.requests.query(filters: [
+            Filter(kinds: [kind], eTags: [video.id])
+          ]).future,
+          builder: (ctx, data) {
+            final hasMyReaction =
+                data.data?.any((e) => e.pubKey == ndk.accounts.getPublicKey()) ?? false;
+            return Column(
+              children: [
+                SvgPicture.asset(
+                  "assets/svg/${icon}.svg",
+                  colorFilter: hasMyReaction
+                      ? ColorFilter.mode(activeColor, BlendMode.srcATop)
+                      : null,
+                ),
+                Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Text(
                       title ?? data.data?.length.toString() ?? "0",
                       style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w500,
                           fontSize: 14.0),
-                    );
-                  }),
-            )
-          ],
+                    )),
+              ],
+            );
+          },
         ),
       ),
     );

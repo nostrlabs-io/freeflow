@@ -41,25 +41,26 @@ class _CommentsWidget extends State<CommentsWidget> {
                   ),
                 ),
               ),
-              Row(
-                spacing: 10,
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _comment,
-                      decoration: InputDecoration(
-                        labelText: "Comment",
+              if (ndk.accounts.isLoggedIn)
+                Row(
+                  spacing: 10,
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _comment,
+                        decoration: InputDecoration(
+                          labelText: "Comment",
+                        ),
                       ),
                     ),
-                  ),
-                  BasicButton.text("Send", onTap: () async {
-                    await _postComment();
-                    setState(() {
-                      _comment.clear();
-                    });
-                  }),
-                ],
-              )
+                    BasicButton.text("Send", onTap: () async {
+                      await _postComment();
+                      setState(() {
+                        _comment.clear();
+                      });
+                    }),
+                  ],
+                )
             ],
           );
         },
