@@ -156,9 +156,9 @@ Future<void> main() async {
 }
 
 String formatSats(int n) {
-  if (n > 1000000) {
+  if (n >= 1000000) {
     return (n / 1000000).toStringAsFixed(0) + "M";
-  } else if (n > 1000) {
+  } else if (n >= 1000) {
     return (n / 1000).toStringAsFixed(0) + "k";
   } else {
     return "${n}";

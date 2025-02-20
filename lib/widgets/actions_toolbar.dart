@@ -4,6 +4,7 @@ import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/widgets/avatar.dart';
 import 'package:freeflow/widgets/comments.dart';
+import 'package:freeflow/widgets/zap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
 
@@ -59,11 +60,20 @@ class ActionsToolbar extends StatelessWidget {
                     builder: (context) => CommentsWidget(video: video));
               }),
           _getSocialAction(
-            icon: "zap",
-            activeColor: Colors.red,
-            kind: 9735,
-            title: 'Zap',
-          )
+              icon: "zap",
+              activeColor: Colors.red,
+              kind: 9735,
+              title: 'Zap',
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  constraints: BoxConstraints.expand(),
+                  builder: (context) => ZapWidget(
+                    pubkey: video.user,
+                    target: video.event,
+                  ),
+                );
+              })
         ],
       ),
     );
@@ -84,8 +94,15 @@ class ActionsToolbar extends StatelessWidget {
             Filter(kinds: [kind], eTags: [video.id])
           ]).future,
           builder: (ctx, data) {
-            final hasMyReaction =
-                data.data?.any((e) => e.pubKey == ndk.accounts.getPublicKey()) ?? false;
+            final hasMyReaction = data.data?.any((e) {
+                  if (e.kind != 9735) {
+                    return e.pubKey == ndk.accounts.getPublicKey();
+                  } else {
+                    return ZapReceipt.fromEvent(e).sender ==
+                        ndk.accounts.getPublicKey();
+                  }
+                }) ??
+                false;
             return Column(
               children: [
                 SvgPicture.asset(
