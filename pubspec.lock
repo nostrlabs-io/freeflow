@@ -49,6 +49,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.0"
+  build_cli_annotations:
+    dependency: transitive
+    description:
+      name: build_cli_annotations
+      sha256: b59d2769769efd6c9ff6d4c4cede0be115a566afc591705c2040b707534b1172
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   cached_network_image:
     dependency: "direct main"
     description:
@@ -310,6 +318,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.24"
+  flutter_rust_bridge:
+    dependency: transitive
+    description:
+      name: flutter_rust_bridge
+      sha256: "3292ad6085552987b8b3b9a7e5805567f4013372d302736b702801acb001ee00"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.7.1"
   flutter_secure_storage:
     dependency: "direct main"
     description:
@@ -571,6 +587,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.0"
+  ndk_rust_verifier:
+    dependency: "direct main"
+    description:
+      name: ndk_rust_verifier
+      sha256: "56445180fff41daec308a88e7c3031b9df6978ee6bed5cc803b7cc238201390e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.2"
   objectbox:
     dependency: transitive
     description:
@@ -715,6 +739,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.1"
+  rust_lib_ndk:
+    dependency: transitive
+    description:
+      name: rust_lib_ndk
+      sha256: "5bb8f455cebd72a174d0974651bacfaacb7638960ac9029d741d0dc4dd123e71"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.3"
   rxdart:
     dependency: transitive
     description:

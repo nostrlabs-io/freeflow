@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
+import 'package:freeflow/widgets/comments.dart';
 import 'package:ndk/ndk.dart';
 
 class ActionsToolbar extends StatelessWidget {
@@ -30,39 +31,64 @@ class ActionsToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: ActionWidgetSize,
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        _getFollowAction(user),
-        _getSocialAction(icon: "heart", kind: 7),
-        _getSocialAction(icon: "comment", kind: 1111),
-        _getSocialAction(icon: "reply", kind: 0, title: 'Share')
-      ]),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 15,
+        children: [
+          _getFollowAction(user),
+          _getSocialAction(
+              icon: "heart",
+              kind: 7,
+              onPressed: () {
+                ndk.broadcast.broadcastReaction(eventId: video.id);
+              }),
+          _getSocialAction(
+              icon: "comment",
+              kind: 1111,
+              onPressed: () {
+                showModalBottomSheet(
+                    context: context,
+                    constraints: BoxConstraints.expand(),
+                    builder: (context) => CommentsWidget(video: video));
+              }),
+          _getSocialAction(icon: "zap", kind: 9735, title: 'Zap')
+        ],
+      ),
     );
   }
 
   Widget _getSocialAction(
-      {required String icon, required int kind, String? title}) {
-    return Container(
-        margin: EdgeInsets.only(top: 15.0),
+      {required String icon,
+      required int kind,
+      String? title,
+      void Function()? onPressed}) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
         width: ActionWidgetSize,
-        child: Column(children: [
-          SvgPicture.asset("assets/svg/${icon}.svg"),
-          Padding(
-            padding: EdgeInsets.only(top: 8),
-            child: FutureBuilder(
-                future: ndk.requests.query(filters: [
-                  Filter(kinds: [kind], eTags: [video.id])
-                ]).future,
-                builder: (ctx, data) {
-                  return Text(
-                    title ?? data.data?.length.toString() ?? "0",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14.0),
-                  );
-                }),
-          )
-        ]));
+        child: Column(
+          children: [
+            SvgPicture.asset("assets/svg/${icon}.svg"),
+            Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: FutureBuilder(
+                  future: ndk.requests.query(filters: [
+                    Filter(kinds: [kind], eTags: [video.id])
+                  ]).future,
+                  builder: (ctx, data) {
+                    return Text(
+                      title ?? data.data?.length.toString() ?? "0",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14.0),
+                    );
+                  }),
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _getFollowAction(Metadata profile) {
@@ -112,41 +138,5 @@ class ActionsToolbar extends StatelessWidget {
                       new CircularProgressIndicator(),
                   errorWidget: (context, url, error) => new Icon(Icons.error),
                 ))));
-  }
-
-  LinearGradient get musicGradient => LinearGradient(colors: [
-        Colors.grey[800]!,
-        Colors.grey[900]!,
-        Colors.grey[900]!,
-        Colors.grey[800]!
-      ], stops: [
-        0.0,
-        0.4,
-        0.6,
-        1.0
-      ], begin: Alignment.bottomLeft, end: Alignment.topRight);
-
-  Widget _getMusicPlayerAction(userPic) {
-    return Container(
-        margin: EdgeInsets.only(top: 10.0),
-        width: ActionWidgetSize,
-        height: ActionWidgetSize,
-        child: Column(children: [
-          Container(
-              padding: EdgeInsets.all(11.0),
-              height: ProfileImageSize,
-              width: ProfileImageSize,
-              decoration: BoxDecoration(
-                  gradient: musicGradient,
-                  borderRadius: BorderRadius.circular(ProfileImageSize / 2)),
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10000.0),
-                  child: CachedNetworkImage(
-                    imageUrl: userPic,
-                    placeholder: (context, url) =>
-                        new CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => new Icon(Icons.error),
-                  ))),
-        ]));
   }
 }

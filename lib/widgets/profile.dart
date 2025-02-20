@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/imgproxy.dart';
 import 'package:freeflow/main.dart';
+import 'package:freeflow/widgets/avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
@@ -45,22 +46,10 @@ class ProfileWidget extends StatelessWidget {
                   height: 15,
                 ),
                 Center(
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      fit: BoxFit.cover,
-                      imageUrl: proxyImg(
-                          context,
-                          profile.picture ??
-                              "https://nostr.api.v0l.io/api/v1/avatar/cyberpunks/${profile.pubKey}",
-                          resize: 100),
-                      height: 100.0,
-                      width: 100.0,
-                      placeholder: (context, url) =>
-                          CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => Icon(Icons.error),
-                    ),
-                  ),
-                ),
+                    child: AvatarWidget(
+                  profile: profile,
+                  size: 100,
+                )),
                 SizedBox(
                   height: 10,
                 ),
