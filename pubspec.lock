@@ -566,10 +566,11 @@ packages:
   ndk:
     dependency: "direct main"
     description:
-      name: ndk
-      sha256: a299ce4f2bc8f1ecb67b87f552f6d793a44ec63a5cb0f4703a8558f1bbd62950
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/ndk"
+      ref: cc404d7f0773de850eb9f22990f2b13d28d7f97e
+      resolved-ref: cc404d7f0773de850eb9f22990f2b13d28d7f97e
+      url: "https://github.com/relaystr/ndk"
+    source: git
     version: "0.2.6"
   ndk_amber:
     dependency: "direct main"
@@ -583,10 +584,10 @@ packages:
     dependency: "direct main"
     description:
       name: ndk_objectbox
-      sha256: c0480f6762fa4d1dd8e1ee497f02b84162becd769a91eb497948e6140dcba60d
+      sha256: "6897f82c691b185d9095db146df0e08233cb2d115b9888eeda27b39928961709"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.0"
+    version: "0.2.1"
   ndk_rust_verifier:
     dependency: "direct main"
     description:

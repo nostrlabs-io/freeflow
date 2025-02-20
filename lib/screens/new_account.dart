@@ -5,7 +5,6 @@ import 'package:freeflow/widgets/button.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ndk/config/bootstrap_relays.dart';
 import 'package:ndk/domain_layer/entities/metadata.dart';
 import 'package:ndk/shared/nips/nip01/bip340.dart';
 import 'package:ndk/shared/nips/nip01/key_pair.dart';

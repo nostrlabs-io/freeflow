@@ -83,13 +83,12 @@ class _CommentsWidget extends State<CommentsWidget> {
   }
 
   Future<Nip01Event> _postComment() async {
-    final acc = GetIt.I.get<LoginData>().value;
-    if (acc == null) {
+    if (ndk.accounts.isNotLoggedIn) {
       throw "Not logged in";
     }
 
     final ev = Nip01Event(
-        pubKey: acc.pubkey,
+        pubKey: ndk.accounts.getPublicKey()!,
         kind: 1111,
         content: _comment.text,
         tags: [
