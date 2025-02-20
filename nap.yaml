@@ -1,11 +1,13 @@
 id: "io.nostrlabs.freeflow"
 name: "Freeflow"
 description: "Live in the moment"
-icon: "https://freeflow.app/icon.png"
+icon: "https://nostr.download/b7f6bd1e3951185e49a04f733de61d1658b710645a40a875d5d18fdbcadf85cd.webp"
 images:
-  - "https://freeflow.app/banner.jpg"
+  - "https://nostr.download/b6120e8aff11395bca8e51d720e9f4af636ed240dfe04d3b32f5f89cb5966eab.webp"
 repository: "https://github.com/nostrlabs-io/freeflow"
+url: "https://freeflow.app"
 license: "MIT"
 tags:
   - "tiktok"
   - "shorts"
+  - "video"
