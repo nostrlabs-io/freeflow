@@ -43,7 +43,8 @@ class ActionsToolbar extends StatelessWidget {
               icon: "heart",
               activeColor: Colors.red,
               kind: 7,
-              onPressed: () {
+              onPressed: (hasReacted) {
+                if (hasReacted) return;
                 if (ndk.accounts.isNotLoggedIn) {
                   context.go("/login");
                   return;
@@ -54,7 +55,7 @@ class ActionsToolbar extends StatelessWidget {
               icon: "comment",
               activeColor: Colors.blueAccent,
               kind: 1111,
-              onPressed: () {
+              onPressed: (_) {
                 showModalBottomSheet(
                     context: context,
                     constraints: BoxConstraints.expand(),
@@ -65,7 +66,7 @@ class ActionsToolbar extends StatelessWidget {
               activeColor: Colors.red,
               kind: 9735,
               title: 'Zap',
-              onPressed: () {
+              onPressed: (_) {
                 showModalBottomSheet(
                   context: context,
                   constraints: BoxConstraints.expand(),
@@ -85,45 +86,48 @@ class ActionsToolbar extends StatelessWidget {
       required int kind,
       required Color activeColor,
       String? title,
-      void Function()? onPressed}) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        width: ActionWidgetSize,
-        child: RxFilter<Nip01Event>(
-          filter: Filter(kinds: [kind], eTags: [video.id]),
-          builder: (ctx, data) {
-            final hasMyReaction = data?.any((e) {
-                  if (e.kind != 9735) {
-                    return e.pubKey == ndk.accounts.getPublicKey();
-                  } else {
-                    return ZapReceipt.fromEvent(e).sender ==
-                        ndk.accounts.getPublicKey();
-                  }
-                }) ??
-                false;
-            return Column(
-              children: [
-                SvgPicture.asset(
-                  "assets/svg/${icon}.svg",
-                  colorFilter: hasMyReaction
-                      ? ColorFilter.mode(activeColor, BlendMode.srcATop)
-                      : null,
-                ),
-                Padding(
-                    padding: EdgeInsets.only(top: 8),
-                    child: Text(
-                      title ?? data?.length.toString() ?? "0",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14.0),
-                    )),
-              ],
-            );
+      void Function(bool)? onPressed}) {
+    return RxFilter<Nip01Event>(
+      filter: Filter(kinds: [kind], eTags: [video.id]),
+      builder: (ctx, data) {
+        final hasMyReaction = data?.any((e) {
+              if (e.kind != 9735) {
+                return e.pubKey == ndk.accounts.getPublicKey();
+              } else {
+                return ZapReceipt.fromEvent(e).sender ==
+                    ndk.accounts.getPublicKey();
+              }
+            }) ??
+            false;
+        return GestureDetector(
+          onTap: () {
+            if (onPressed != null) {
+              onPressed(hasMyReaction);
+            }
           },
-        ),
-      ),
+          child: Container(
+              width: ActionWidgetSize,
+              child: Column(
+                children: [
+                  SvgPicture.asset(
+                    "assets/svg/${icon}.svg",
+                    colorFilter: hasMyReaction
+                        ? ColorFilter.mode(activeColor, BlendMode.srcATop)
+                        : null,
+                  ),
+                  Padding(
+                      padding: EdgeInsets.only(top: 8),
+                      child: Text(
+                        title ?? data?.length.toString() ?? "0",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14.0),
+                      )),
+                ],
+              )),
+        );
+      },
     );
   }
 
