@@ -28,6 +28,7 @@ class _CommentsWidget extends State<CommentsWidget> {
       child: RxFilter<Nip01Event>(
         filter: Filter(kinds: [1111], eTags: [widget.video.id]),
         builder: (context, data) {
+          data?.sort((a, b) => b.createdAt.compareTo(a.createdAt));
           return Column(
             spacing: 10,
             children: [
