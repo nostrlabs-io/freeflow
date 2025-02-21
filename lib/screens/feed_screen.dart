@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
+import 'package:freeflow/rx_filter.dart';
 import 'package:freeflow/view_model/feed_viewmodel.dart';
 import 'package:freeflow/view_model/login.dart';
 import 'package:freeflow/widgets/profile.dart';
@@ -35,23 +36,27 @@ class _FeedScreenState extends State<FeedScreen> {
         PageView.builder(
           itemCount: 2,
           itemBuilder: (context, index) {
-            final feedViewModel = GetIt.instance<FeedViewModel>();
             if (index == 0) {
-              return FutureBuilder<List<Video>>(
+              return RxFutureFilter<Video>(
                 key: Key("feed-view:${_tab.name}"),
-                future: () async {
+                leaveOpen: false,
+                mapper: (e) => Video.fromEvent(e),
+                filterBuilder: () async {
                   final authors =
                       acc?.pubkey != null && _tab == FeedTab.Following
                           ? (await ndk.follows.getContactList(acc!.pubkey))
                               ?.contacts
                           : null;
-                  feedViewModel.reset();
-                  print(
-                      "Loading feed ${_tab.name}, authors=${authors?.length}");
-                  return await feedViewModel.loadVideoData(authors);
-                }(),
+                  return Filter(kinds: SHORT_KIND, authors: authors, limit: 20);
+                },
                 builder: (ctx, data) {
-                  final videos = data.data;
+                  final feedViewModel = GetIt.I.get<FeedViewModel>();
+                  final videos = data;
+                  if (videos != null) {
+                    videos.sort((a, b) =>
+                        b.event.createdAt.compareTo(a.event.createdAt));
+                    feedViewModel.setVideos(videos);
+                  }
                   return PageView.builder(
                     controller: PageController(
                       initialPage: feedViewModel.currentVideoIndex,
@@ -85,6 +90,7 @@ class _FeedScreenState extends State<FeedScreen> {
                 },
               );
             } else {
+              final feedViewModel = GetIt.I.get<FeedViewModel>();
               final vid = feedViewModel.currentVideo!;
               return FutureBuilder(
                   key: Key("profile-card:${vid.user}"),

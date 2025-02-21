@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
+import 'package:freeflow/rx_filter.dart';
 import 'package:freeflow/widgets/avatar.dart';
 import 'package:freeflow/widgets/comments.dart';
 import 'package:freeflow/widgets/zap.dart';
@@ -89,12 +90,10 @@ class ActionsToolbar extends StatelessWidget {
       onTap: onPressed,
       child: Container(
         width: ActionWidgetSize,
-        child: FutureBuilder(
-          future: ndk.requests.query(filters: [
-            Filter(kinds: [kind], eTags: [video.id])
-          ]).future,
+        child: RxFilter<Nip01Event>(
+          filter: Filter(kinds: [kind], eTags: [video.id]),
           builder: (ctx, data) {
-            final hasMyReaction = data.data?.any((e) {
+            final hasMyReaction = data?.any((e) {
                   if (e.kind != 9735) {
                     return e.pubKey == ndk.accounts.getPublicKey();
                   } else {
@@ -114,7 +113,7 @@ class ActionsToolbar extends StatelessWidget {
                 Padding(
                     padding: EdgeInsets.only(top: 8),
                     child: Text(
-                      title ?? data.data?.length.toString() ?? "0",
+                      title ?? data?.length.toString() ?? "0",
                       style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w500,

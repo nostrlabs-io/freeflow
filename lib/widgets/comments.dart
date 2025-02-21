@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
+import 'package:freeflow/rx_filter.dart';
 import 'package:freeflow/theme.dart';
 import 'package:freeflow/widgets/avatar.dart';
 import 'package:freeflow/widgets/button.dart';
@@ -24,20 +25,18 @@ class _CommentsWidget extends State<CommentsWidget> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(10),
-      child: FutureBuilder(
-        future: ndk.requests.query(filters: [
-          Filter(kinds: [1111], eTags: [widget.video.id])
-        ]).future,
+      child: RxFilter<Nip01Event>(
+        filter: Filter(kinds: [1111], eTags: [widget.video.id]),
         builder: (context, data) {
           return Column(
             spacing: 10,
             children: [
-              Text("${data.data?.length ?? 0} comments"),
+              Text("${data?.length ?? 0} comments"),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     spacing: 5,
-                    children: data.data?.map(_commentWidget).toList() ?? [],
+                    children: data?.map(_commentWidget).toList() ?? [],
                   ),
                 ),
               ),

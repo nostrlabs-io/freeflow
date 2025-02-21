@@ -2,6 +2,7 @@ import 'package:amberflutter/amberflutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
+import 'package:freeflow/rx_filter.dart';
 import 'package:freeflow/screens/create.dart';
 import 'package:freeflow/screens/create_preview.dart';
 import 'package:freeflow/screens/feed_screen.dart';
@@ -31,7 +32,7 @@ class NoVerify extends EventVerifier {
 }
 
 final ndk_cache = DbObjectBox();
-final eventVerifier = kDebugMode? NoVerify(): RustEventVerifier();
+final eventVerifier = kDebugMode ? NoVerify() : RustEventVerifier();
 var ndk = Ndk(
   NdkConfig(
     eventVerifier: eventVerifier,
@@ -62,9 +63,9 @@ Future<void> main() async {
                 pubkey: l.value!.pubkey, privkey: l.value!.privateKey!);
           case AccountType.externalSigner:
             ndk.accounts.loginExternalSigner(
-                signer: AmberEventSigner(publicKey: l.value!.pubkey,
-                    amberFlutterDS: AmberFlutterDS(Amberflutter()))
-            );
+                signer: AmberEventSigner(
+                    publicKey: l.value!.pubkey,
+                    amberFlutterDS: AmberFlutterDS(Amberflutter())));
           case AccountType.publicKey:
             ndk.accounts.loginPublicKey(pubkey: l.value!.pubkey);
         }
@@ -124,19 +125,12 @@ Future<void> main() async {
                     return ShortVideoPlayer(
                         Video.fromEvent(state.extra as Nip01Event));
                   } else {
-                    return FutureBuilder(
-                      future: ndk.requests.query(
-                        filters: [
-                          Filter(
-                            ids: [Nip19.decode(state.pathParameters["id"]!)],
-                          ),
-                        ],
-                        timeout: Duration(seconds: 30),
-                      ).future,
+                    return RxFilter<Nip01Event>(
+                      filter: Filter(
+                        ids: [Nip19.decode(state.pathParameters["id"]!)],
+                      ),
                       builder: (ctx, data) {
-                        final ev = (data.data?.length ?? 0) > 0
-                            ? data.data!.first
-                            : null;
+                        final ev = (data?.length ?? 0) > 0 ? data!.first : null;
                         if (ev != null) {
                           return ShortVideoPlayer(Video.fromEvent(ev));
                         } else {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/imgproxy.dart';
 import 'package:freeflow/main.dart';
+import 'package:freeflow/rx_filter.dart';
 import 'package:freeflow/widgets/avatar.dart';
 import 'package:freeflow/widgets/profile_name.dart';
 import 'package:go_router/go_router.dart';
@@ -18,6 +19,7 @@ class ProfileWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
+      constraints: BoxConstraints.expand(),
       child: Column(
         children: [
           Container(
@@ -36,8 +38,7 @@ class ProfileWidget extends StatelessWidget {
               ],
             ),
           ),
-          SingleChildScrollView(
-            primary: true,
+          Expanded(
             child: Column(
               children: [
                 SizedBox(
@@ -113,12 +114,12 @@ class ProfileWidget extends StatelessWidget {
                     ),
                     Column(
                       children: [
-                        FutureBuilder(
-                            future: ndk.zaps
-                                .fetchZappedReceipts(pubKey: profile.pubKey)
-                                .toList(),
+                        RxFilter<ZapReceipt>(
+                            filter:
+                                Filter(pTags: [profile.pubKey], kinds: [9735]),
+                            mapper: (e) => ZapReceipt.fromEvent(e),
                             builder: (context, data) {
-                              if (!data.hasData) {
+                              if (data == null) {
                                 return SizedBox(
                                   width: 29,
                                   height: 29,
@@ -126,11 +127,8 @@ class ProfileWidget extends StatelessWidget {
                                 );
                               }
                               return Text(
-                                formatSats(data.data?.fold(
-                                        0,
-                                        (acc, v) =>
-                                            acc! + (v.amountSats ?? 0)) ??
-                                    0),
+                                formatSats(data.fold(
+                                    0, (acc, v) => acc + (v.amountSats ?? 0))),
                                 style: TextStyle(
                                     fontSize: 20, fontWeight: FontWeight.bold),
                               );
@@ -208,32 +206,39 @@ class ProfileWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-                StreamBuilder(
-                    stream: ndk.requests
-                        .query(filters: [
-                          Filter(
-                              kinds: SHORT_KIND,
-                              authors: [profile.pubKey],
-                              limit: 10)
-                        ])
-                        .future
-                        .asStream(),
-                    builder: (ctx, snapshot) {
-                      if (snapshot.hasData) {
-                        return GridView.builder(
-                            shrinkWrap: true,
-                            itemCount: snapshot.data!.length,
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3),
-                            itemBuilder: (ctx, idx) {
+                Expanded(
+                  child: RxFilter<Video>(
+                    filter: Filter(
+                        kinds: SHORT_KIND,
+                        authors: [profile.pubKey],
+                        limit: 10),
+                    mapper: (e) => Video.fromEvent(e),
+                    builder: (ctx, data) {
+                      data?.sort((a, b) =>
+                          b.event.createdAt.compareTo(a.event.createdAt));
+                      return GridView.builder(
+                          shrinkWrap: true,
+                          itemCount: data?.length ?? 0,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            crossAxisSpacing: 2,
+                            mainAxisSpacing: 2,
+                            childAspectRatio: 9 / 16,
+                          ),
+                          itemBuilder: (ctx, idx) {
+                            if ((data?.length ?? 0) >= idx) {
                               return _profileTile(
-                                  ctx, Video.fromEvent(snapshot.data![idx]));
-                            });
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                    }),
+                                ctx,
+                                data![idx],
+                              );
+                            } else {
+                              return null;
+                            }
+                          });
+                    },
+                  ),
+                ),
               ],
             ),
           ),
