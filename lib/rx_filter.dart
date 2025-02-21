@@ -33,6 +33,7 @@ class _RxFilter<T> extends State<RxFilter<T>> {
   @override
   void initState() {
     super.initState();
+    print("RX:SEDNING ${widget.filter}");
     _response = ndk.requests.subscription(
         filters: [widget.filter], cacheRead: true, cacheWrite: true);
     if (!widget.leaveOpen) {
@@ -58,6 +59,8 @@ class _RxFilter<T> extends State<RxFilter<T>> {
   @override
   void dispose() {
     super.dispose();
+
+    print("RX:CLOSING ${widget.filter}");
     ndk.requests.closeSubscription(_response.requestId);
   }
 
