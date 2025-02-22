@@ -1,3 +1,4 @@
+import java.util.Base64
 
 plugins {
     id "com.android.application"
@@ -18,7 +19,7 @@ def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-}
+} 
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
@@ -28,6 +29,46 @@ if (flutterVersionCode == null) {
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
     flutterVersionName = '1.0'
+}
+
+def getKeystoreFile(String base64String, String fileName) {
+    def decodedBytes = Base64.getDecoder().decode(base64String)
+    def tempFile = new File("${buildDir}/keystores/${fileName}")
+    tempFile.parentFile.mkdirs()
+    tempFile.bytes = decodedBytes
+    return tempFile
+}
+
+android {
+    signingConfigs {
+        env {
+            keyAlias System.getenv("KEY_ALIAS")
+            keyPassword System.getenv("KEY_PASSWORD")
+            storeFile getKeystoreFile(System.getenv("KEYSTORE"), "store.jks")
+            storePassword System.getenv("KEYSTORE_PASSWORD")
+        }
+        keyfile {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+}
+
+def getSigningConfig() {
+    if(System.getenv("KEYSTORE")) {
+        println "Signing: using env vars"
+        return android.signingConfigs.env
+    }
+    println "Signing: using key.properties"
+    return android.signingConfigs.keyfile
+}
+
+// pick signing config
+def cfg = getSigningConfig()
+if (cfg == null) {
+    throw new GradleException("Signing config is null!")
 }
 
 android {
@@ -55,18 +96,9 @@ android {
         versionName flutterVersionName
     }
 
-    signingConfigs {
-       release {
-           keyAlias keystoreProperties['keyAlias']
-           keyPassword keystoreProperties['keyPassword']
-           storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
-           storePassword keystoreProperties['storePassword']
-       }
-   }
-
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+            signingConfig cfg
         }
     }
     namespace 'io.nostrlabs.freeflow'
