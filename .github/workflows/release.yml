@@ -23,6 +23,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEYSTORE_SHA256: ${{ secrets.KEYSTORE_SHA256 }}
         run: flutter build apk --split-per-abi --release
       - uses: actions/upload-artifact@v4
         with:
