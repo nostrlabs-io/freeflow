@@ -1,4 +1,5 @@
 import java.util.Base64
+import java.security.MessageDigest
 
 plugins {
     id "com.android.application"
@@ -31,11 +32,17 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
-def getKeystoreFile(String base64String, String fileName) {
+def getKeystoreFile(String base64String, String hash, String fileName) {
     def decodedBytes = Base64.getDecoder().decode(base64String)
     def tempFile = new File("${buildDir}/keystores/${fileName}")
     tempFile.parentFile.mkdirs()
     tempFile.bytes = decodedBytes
+    
+    def digest = MessageDigest.getInstance("SHA-256")
+    def tmpHash = digest.digest(decodedBytes)
+    if(tmpHash.encodeHex().toString() != hash) {
+        throw new GradleException("Keystore hash mismatch")
+    }
     return tempFile
 }
 
@@ -44,7 +51,7 @@ android {
         env {
             keyAlias System.getenv("KEY_ALIAS")
             keyPassword System.getenv("KEY_PASSWORD")
-            storeFile getKeystoreFile(System.getenv("KEYSTORE"), "store.jks")
+            storeFile getKeystoreFile(System.getenv("KEYSTORE"), System.getenv("KEYSTORE_SHA256"), "store.jks")
             storePassword System.getenv("KEYSTORE_PASSWORD")
         }
         keyfile {
