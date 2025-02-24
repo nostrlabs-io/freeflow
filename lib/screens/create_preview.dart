@@ -128,6 +128,9 @@ class _CreatePreview extends State<CreatePreview> {
     if (acc == null) {
       throw "Not logged in";
     }
+    setState(() {
+      _error = null;
+    });
 
     final upload = await ndk.blossom.uploadBlob(
         data: await videoFile.file!.readAsBytes(),
