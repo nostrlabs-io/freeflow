@@ -8,6 +8,7 @@ import 'package:freeflow/widgets/comments.dart';
 import 'package:freeflow/widgets/zap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
+import 'package:ndk/shared/nips/nip25/reactions.dart';
 
 class ActionsToolbar extends StatelessWidget {
   // Full dimensions of an action
@@ -32,6 +33,7 @@ class ActionsToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final myPubkey = ndk.accounts.getPublicKey();
     return Container(
       width: ActionWidgetSize,
       child: Column(
@@ -49,7 +51,17 @@ class ActionsToolbar extends StatelessWidget {
                   context.go("/login");
                   return;
                 }
-                ndk.broadcast.broadcastReaction(eventId: video.id);
+                final reaction = Nip01Event(
+                  pubKey: myPubkey!,
+                  content: "+",
+                  kind: Reaction.kKind,
+                  tags: [
+                    ["e", video.id],
+                    ["p", video.user],
+                    ["k", video.event.kind.toString()],
+                  ],
+                );
+                ndk.broadcast.broadcast(nostrEvent: reaction);
               }),
           _getSocialAction(
               icon: "comment",

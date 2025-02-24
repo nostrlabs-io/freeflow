@@ -8,7 +8,7 @@ import 'package:freeflow/screens/create_preview.dart';
 import 'package:freeflow/screens/feed_screen.dart';
 import 'package:freeflow/screens/layout.dart';
 import 'package:freeflow/screens/login.dart';
-import 'package:freeflow/screens/messages_screen.dart';
+import 'package:freeflow/screens/notifications.dart';
 import 'package:freeflow/screens/new_account.dart';
 import 'package:freeflow/screens/profile_screen.dart';
 import 'package:freeflow/screens/search_screen.dart';
@@ -97,7 +97,7 @@ Future<void> main() async {
                   path: "/search", builder: (context, state) => SearchScreen()),
               GoRoute(
                 path: "/messages",
-                builder: (context, state) => MessagesScreen(),
+                builder: (context, state) => NotificationsScreen(),
               ),
               GoRoute(
                 path: "/create",

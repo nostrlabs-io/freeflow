@@ -9,14 +9,14 @@ import 'package:freeflow/widgets/avatar.dart';
 import 'package:freeflow/widgets/profile_name.dart';
 import 'package:ndk/ndk.dart';
 
-class MessagesScreen extends StatefulWidget {
-  MessagesScreen({Key? key}) : super(key: key);
+class NotificationsScreen extends StatefulWidget {
+  NotificationsScreen({Key? key}) : super(key: key);
 
   @override
-  _MessagesScreenState createState() => _MessagesScreenState();
+  _NotificationsScreenState createState() => _NotificationsScreenState();
 }
 
-class _MessagesScreenState extends State<MessagesScreen> {
+class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -53,6 +53,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 child: RxFilter<Nip01Event>(
                   filter: Filter(
                     pTags: [ndk.accounts.getPublicKey() ?? ""],
+                    arbitraryTags: {
+                      "#k": ["22"]
+                    },
                     kinds: [1111, 9735, 7],
                     limit: 20,
                   ),
