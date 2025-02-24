@@ -5,6 +5,7 @@ import 'package:freeflow/main.dart';
 import 'package:freeflow/rx_filter.dart';
 import 'package:freeflow/widgets/avatar.dart';
 import 'package:freeflow/widgets/comments.dart';
+import 'package:freeflow/widgets/follow_button.dart';
 import 'package:freeflow/widgets/zap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
@@ -145,27 +146,44 @@ class ActionsToolbar extends StatelessWidget {
 
   Widget _getFollowAction(Metadata profile) {
     return Container(
-        margin: EdgeInsets.symmetric(vertical: 10.0),
-        width: ActionWidgetSize,
-        height: ActionWidgetSize,
-        child: Stack(children: [_getProfilePicture(profile), _getPlusIcon()]));
+      margin: EdgeInsets.symmetric(vertical: 10.0),
+      width: ActionWidgetSize,
+      height: ActionWidgetSize,
+      child: Stack(
+        children: [
+          _getProfilePicture(profile),
+          _getPlusIcon(profile),
+        ],
+      ),
+    );
   }
 
-  Widget _getPlusIcon() {
+  Widget _getPlusIcon(Metadata profile) {
     return Positioned(
       bottom: 0,
       left: ((ActionWidgetSize / 2) - (PlusIconSize / 2)),
-      child: Container(
-          width: PlusIconSize, // PlusIconSize = 20.0;
-          height: PlusIconSize, // PlusIconSize = 20.0;
-          decoration: BoxDecoration(
-              color: Color.fromARGB(255, 255, 43, 84),
-              borderRadius: BorderRadius.circular(15.0)),
-          child: Icon(
-            Icons.add,
-            color: Colors.white,
-            size: 20.0,
-          )),
+      child: FollowButtonWidget(
+        profile.pubKey,
+        child: (f) {
+          if (f) {
+            return SizedBox.shrink();
+          } else {
+            return Container(
+              width: PlusIconSize, // PlusIconSize = 20.0;
+              height: PlusIconSize, // PlusIconSize = 20.0;
+              decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 255, 43, 84),
+                  borderRadius: BorderRadius.circular(15.0)),
+              child: Icon(
+                Icons.add,
+                color: Colors.white,
+                size: 20.0,
+              ),
+            );
+          }
+        },
+        loaderWidget: SizedBox.shrink(),
+      ),
     );
   }
 

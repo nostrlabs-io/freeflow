@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
@@ -7,6 +5,7 @@ import 'package:freeflow/imgproxy.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/rx_filter.dart';
 import 'package:freeflow/widgets/avatar.dart';
+import 'package:freeflow/widgets/follow_button.dart';
 import 'package:freeflow/widgets/profile_name.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
@@ -31,7 +30,7 @@ class ProfileWidget extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _followButton(context),
+                FollowButtonWidget(profile.pubKey),
                 ProfileNameWidget(
                   profile: profile,
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
@@ -261,41 +260,6 @@ class ProfileWidget extends StatelessWidget {
         ],
       ),
     ];
-  }
-
-  Widget _followButton(BuildContext context) {
-    final myPubkey = ndk.accounts.getPublicKey();
-    if (myPubkey != null && myPubkey != profile.pubKey) {
-      return RxFilter<List<String>>(
-        filter: Filter(pTags: [myPubkey], kinds: [3]),
-        mapper: (e) => e.tags
-            .where((t) => t[0] == "p" && t[1].length == 64)
-            .map((t) => t[1])
-            .toList(),
-        builder: (ctx, data) {
-          final follows = HashSet.from(data?.expand((i) => i).toList() ?? []);
-          final doesFollow = follows.contains(profile.pubKey);
-          return GestureDetector(
-            onTap: () async {
-              if (doesFollow) {
-                await ndk.follows.broadcastRemoveContact(profile.pubKey);
-              } else {
-                await ndk.follows.broadcastAddContact(profile.pubKey);
-              }
-            },
-            child: Icon(!doesFollow
-                ? Icons.person_add_alt_1_outlined
-                : Icons.person_remove_alt_1_outlined),
-          );
-        },
-      );
-    } else {
-      final theme = IconTheme.of(context);
-      return SizedBox(
-        height: theme.size,
-        width: theme.size,
-      );
-    }
   }
 
   Widget _profileTile(BuildContext context, Video v) {
