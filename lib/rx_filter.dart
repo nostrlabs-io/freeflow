@@ -28,7 +28,7 @@ class RxFilter<T> extends StatefulWidget {
 
 class _RxFilter<T> extends State<RxFilter<T>> {
   late NdkResponse _response;
-  HashSet<T>? _events;
+  HashMap<String, (int, T)>? _events;
 
   @override
   void initState() {
@@ -46,14 +46,29 @@ class _RxFilter<T> extends State<RxFilter<T>> {
         .where((events) => events.isNotEmpty)
         .listen((events) {
       setState(() {
-        _events ??= HashSet();
-        if (widget.mapper != null) {
-          _events!.addAll(events.map((v) => widget.mapper!(v)));
-        } else {
-          _events!.addAll(events.map((v) => v as T));
-        }
+        _events ??= HashMap();
+        events.forEach(_replaceInto);
       });
     });
+  }
+
+  void _replaceInto(Nip01Event ev) {
+    final evKey = _eventKey(ev);
+    final existing = _events?[evKey];
+    if (existing == null || existing.$1 < ev.createdAt) {
+      _events?[evKey] =
+          (ev.createdAt, widget.mapper != null ? widget.mapper!(ev) : ev as T);
+    }
+  }
+
+  String _eventKey(Nip01Event ev) {
+    if ([0, 3].contains(ev.kind) || (ev.kind >= 10000 && ev.kind < 20000)) {
+      return "${ev.kind}:${ev.pubKey}";
+    } else if (ev.kind >= 30000 && ev.kind < 40000) {
+      return "${ev.kind}:${ev.pubKey}:${ev.getDtag()}";
+    } else {
+      return ev.id;
+    }
   }
 
   @override
@@ -66,7 +81,8 @@ class _RxFilter<T> extends State<RxFilter<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.builder(context, _events == null ? null : _events!.toList());
+    return widget.builder(context,
+        _events == null ? null : _events!.values.map((v) => v.$2).toList());
   }
 }
 

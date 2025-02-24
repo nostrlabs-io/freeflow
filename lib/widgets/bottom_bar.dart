@@ -52,7 +52,7 @@ class BottomBar extends StatelessWidget {
           Expanded(child: menuButton(context, 'Search', "search", "/search")),
           Expanded(
             child: GestureDetector(
-                onTap: () => context.go("/create"), child: customCreateIcon),
+                onTap: () => context.push("/create"), child: customCreateIcon),
           ),
           Expanded(child: menuButton(context, 'Inbox', "inbox", "/messages")),
           Expanded(
@@ -72,7 +72,7 @@ class BottomBar extends StatelessWidget {
     final state = GoRouterState.of(context);
     return GestureDetector(
         onTap: () {
-          context.go(path);
+          context.push(path);
         },
         child: Container(
           height: 46,

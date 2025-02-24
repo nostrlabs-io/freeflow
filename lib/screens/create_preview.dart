@@ -105,7 +105,7 @@ class _CreatePreview extends State<CreatePreview> {
                     if (_description.text.length > 4 && _finalFile != null) {
                       _postShort(_description.text, _finalFile!, _videoServer)
                           .then((e) {
-                        context.go("/e/${Nip19.encodeNoteId(e.id)}", extra: e);
+                        context.push("/e/${Nip19.encodeNoteId(e.id)}", extra: e);
                       }).catchError((e) {
                         setState(() {
                           _error = e.toString();

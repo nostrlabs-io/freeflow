@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
@@ -29,7 +31,7 @@ class ProfileWidget extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(Icons.person_add_alt_1_outlined),
+                _followButton(context),
                 ProfileNameWidget(
                   profile: profile,
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
@@ -78,29 +80,6 @@ class ProfileWidget extends StatelessWidget {
                         ),
                         Text(
                           "Following",
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.normal),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      color: Colors.black54,
-                      width: 1,
-                      height: 15,
-                      margin: EdgeInsets.symmetric(horizontal: 15),
-                    ),
-                    Column(
-                      children: [
-                        Text(
-                          "0",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          "Followers",
                           style: TextStyle(
                               fontSize: 12, fontWeight: FontWeight.normal),
                         ),
@@ -247,10 +226,78 @@ class ProfileWidget extends StatelessWidget {
     );
   }
 
+  List<Widget> _followers() {
+    return [
+      Container(
+        color: Colors.black54,
+        width: 1,
+        height: 15,
+        margin: EdgeInsets.symmetric(horizontal: 15),
+      ),
+      Column(
+        children: [
+          RxFilter<Nip01Event>(
+              filter: Filter(pTags: [profile.pubKey], kinds: [3]),
+              builder: (context, data) {
+                if (data == null) {
+                  return SizedBox(
+                    width: 29,
+                    height: 29,
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return Text(
+                  formatSats(data.length),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                );
+              }),
+          SizedBox(
+            height: 5,
+          ),
+          Text(
+            "Followers",
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+          ),
+        ],
+      ),
+    ];
+  }
+
+  Widget _followButton(BuildContext context) {
+    final myPubkey = ndk.accounts.getPublicKey();
+    if (myPubkey != null && myPubkey != profile.pubKey) {
+      return RxFilter<List<String>>(
+        filter: Filter(pTags: [myPubkey], kinds: [3]),
+        mapper: (e) => e.tags
+            .where((t) => t[0] == "p" && t[1].length == 64)
+            .map((t) => t[1])
+            .toList(),
+        builder: (ctx, data) {
+          final follows = HashSet.from(data?.expand((i) => i).toList() ?? []);
+          final doesFollow = follows.contains(profile.pubKey);
+          return GestureDetector(
+            onTap: () async {
+              await ndk.follows.broadcastAddContact(profile.pubKey);
+            },
+            child: Icon(!doesFollow
+                ? Icons.person_add_alt_1_outlined
+                : Icons.person_remove_alt_1_outlined),
+          );
+        },
+      );
+    } else {
+      final theme = IconTheme.of(context);
+      return SizedBox(
+        height: theme.size,
+        width: theme.size,
+      );
+    }
+  }
+
   Widget _profileTile(BuildContext context, Video v) {
     return GestureDetector(
       onTap: () {
-        context.go("/e/${Nip19.encodeNoteId(v.id)}", extra: v.event);
+        context.push("/e/${Nip19.encodeNoteId(v.id)}", extra: v.event);
       },
       child: Container(
         height: 160,

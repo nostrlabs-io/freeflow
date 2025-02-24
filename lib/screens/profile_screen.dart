@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freeflow/main.dart';
-import 'package:freeflow/view_model/login.dart';
 import 'package:freeflow/widgets/profile.dart';
-import 'package:get_it/get_it.dart';
 import 'package:ndk/ndk.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -11,11 +9,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final login = GetIt.I.get<LoginData>();
-    if (login.value == null) {
-      return SizedBox();
-    }
-    final thisPubkey = pubkey == "me" ? login.value!.pubkey : pubkey;
+    final thisPubkey = pubkey == "me" ? ndk.accounts.getPublicKey()! : pubkey;
     final init = Metadata(pubKey: thisPubkey);
     return SafeArea(
         child: FutureBuilder(

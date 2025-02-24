@@ -63,7 +63,7 @@ class _LoginScreen extends State<LoginScreen> {
                       if (keyData.length > 0) {
                         GetIt.I.get<LoginData>().value =
                             Account.nip19(_key.text);
-                        context.go("/");
+                        context.push("/");
                       }
                     },
                   ),
@@ -110,7 +110,7 @@ class _LoginScreen extends State<LoginScreen> {
                               final key = Nip19.decode(result['signature']);
                               GetIt.I.get<LoginData>().value =
                                   Account.externalPublicKeyHex(key);
-                              context.go("/");
+                              context.push("/");
                             }
                           },
                         ),
@@ -145,7 +145,7 @@ class _LoginScreen extends State<LoginScreen> {
                     child: BasicButton.text(
                   "Create Account",
                   fontSize: 16,
-                  onTap: () => context.go("./new"),
+                  onTap: () => context.push("./new"),
                 ))
               ]),
             ],

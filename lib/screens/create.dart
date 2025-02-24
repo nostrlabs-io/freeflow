@@ -87,7 +87,7 @@ class _CreateShortScreen extends State<CreateShortScreen> {
                                 BasicButton.text(
                                   "Next",
                                   onTap: () =>
-                                      context.go("/create/preview", extra: clips),
+                                      context.push("/create/preview", extra: clips),
                                   fontSize: 16,
                                   margin: EdgeInsets.only(right: 5),
                                 ),

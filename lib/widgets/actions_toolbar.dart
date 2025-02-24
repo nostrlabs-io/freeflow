@@ -48,7 +48,7 @@ class ActionsToolbar extends StatelessWidget {
               onPressed: (hasReacted) {
                 if (hasReacted) return;
                 if (ndk.accounts.isNotLoggedIn) {
-                  context.go("/login");
+                  context.push("/login");
                   return;
                 }
                 final reaction = Nip01Event(

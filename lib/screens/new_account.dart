@@ -59,7 +59,7 @@ class _NewAccountScreen extends State<NewAccountScreen> {
               _login().then((_) {
                 GetIt.I.get<LoginData>().value =
                     Account.privateKeyHex(_privateKey.privateKey!);
-                context.go("/");
+                context.push("/");
               }).catchError((e) {
                 setState(() {
                   if (e is String) {
