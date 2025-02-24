@@ -277,7 +277,11 @@ class ProfileWidget extends StatelessWidget {
           final doesFollow = follows.contains(profile.pubKey);
           return GestureDetector(
             onTap: () async {
-              await ndk.follows.broadcastAddContact(profile.pubKey);
+              if (doesFollow) {
+                await ndk.follows.broadcastRemoveContact(profile.pubKey);
+              } else {
+                await ndk.follows.broadcastAddContact(profile.pubKey);
+              }
             },
             child: Icon(!doesFollow
                 ? Icons.person_add_alt_1_outlined
