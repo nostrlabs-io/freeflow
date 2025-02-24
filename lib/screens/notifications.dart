@@ -54,7 +54,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   filter: Filter(
                     pTags: [ndk.accounts.getPublicKey() ?? ""],
                     arbitraryTags: {
-                      "#k": ["22"]
+                      "#k": SHORT_KIND.map((v) => v.toString()).toList()
                     },
                     kinds: [1111, 9735, 7],
                     limit: 20,
