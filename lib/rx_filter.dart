@@ -13,14 +13,16 @@ class RxFilter<T> extends StatefulWidget {
   final bool leaveOpen;
   final Widget Function(BuildContext, List<T>?) builder;
   final T Function(Nip01Event)? mapper;
+  final List<String>? relays;
 
-  RxFilter(
-      {Key? key,
-      required this.filter,
-      required this.builder,
-      this.mapper,
-      this.leaveOpen = true})
-      : super(key: key);
+  RxFilter({
+    Key? key,
+    required this.filter,
+    required this.builder,
+    this.mapper,
+    this.leaveOpen = true,
+    this.relays,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _RxFilter<T>();
@@ -35,7 +37,11 @@ class _RxFilter<T> extends State<RxFilter<T>> {
     super.initState();
     print("RX:SEDNING ${widget.filter}");
     _response = ndk.requests.subscription(
-        filters: [widget.filter], cacheRead: true, cacheWrite: true);
+      filters: [widget.filter],
+      cacheRead: true,
+      cacheWrite: true,
+      explicitRelays: widget.relays,
+    );
     if (!widget.leaveOpen) {
       _response.future.then((_) {
         ndk.requests.closeSubscription(_response.requestId);

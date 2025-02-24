@@ -1,15 +1,12 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
-import 'package:freeflow/imgproxy.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/rx_filter.dart';
 import 'package:freeflow/widgets/avatar.dart';
 import 'package:freeflow/widgets/follow_button.dart';
 import 'package:freeflow/widgets/profile_name.dart';
-import 'package:go_router/go_router.dart';
+import 'package:freeflow/widgets/video_grid.dart';
 import 'package:ndk/ndk.dart';
-import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 class ProfileWidget extends StatelessWidget {
   final Metadata profile;
@@ -192,26 +189,7 @@ class ProfileWidget extends StatelessWidget {
                     builder: (ctx, data) {
                       data?.sort((a, b) =>
                           b.event.createdAt.compareTo(a.event.createdAt));
-                      return GridView.builder(
-                          shrinkWrap: true,
-                          itemCount: data?.length ?? 0,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
-                            crossAxisSpacing: 2,
-                            mainAxisSpacing: 2,
-                            childAspectRatio: 9 / 16,
-                          ),
-                          itemBuilder: (ctx, idx) {
-                            if ((data?.length ?? 0) >= idx) {
-                              return _profileTile(
-                                ctx,
-                                data![idx],
-                              );
-                            } else {
-                              return null;
-                            }
-                          });
+                      return VideoGridWidget(data ?? []);
                     },
                   ),
                 ),
@@ -258,27 +236,5 @@ class ProfileWidget extends StatelessWidget {
         ],
       ),
     ];
-  }
-
-  Widget _profileTile(BuildContext context, Video v) {
-    return GestureDetector(
-      onTap: () {
-        context.push("/e/${Nip19.encodeNoteId(v.id)}", extra: v.event);
-      },
-      child: Container(
-        height: 160,
-        decoration: BoxDecoration(
-            color: Colors.black26,
-            border: Border.all(color: Colors.white70, width: .5)),
-        child: CachedNetworkImage(
-          fit: BoxFit.contain,
-          imageUrl: proxyImg(context, v.image ?? v.url ?? "", resize: 160),
-          placeholder: (context, url) => Center(
-            child: CircularProgressIndicator(),
-          ),
-          errorWidget: (context, url, error) => Icon(Icons.error),
-        ),
-      ),
-    );
   }
 }

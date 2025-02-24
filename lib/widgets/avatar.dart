@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:freeflow/imgproxy.dart';
-import 'package:freeflow/main.dart';
+import 'package:freeflow/widgets/profile_loader.dart';
 import 'package:ndk/ndk.dart';
 
 class AvatarWidget extends StatelessWidget {
@@ -11,9 +11,9 @@ class AvatarWidget extends StatelessWidget {
   AvatarWidget({required this.profile, this.size});
 
   static Widget pubkey(String pubkey, {double? size}) {
-    return FutureBuilder(
-      future: ndk.metadata.loadMetadata(pubkey),
-      builder: (ctx, data) {
+    return ProfileLoaderWidget(
+      pubkey,
+      (ctx, data) {
         return AvatarWidget(
           profile: data.data ?? Metadata(pubKey: pubkey),
           size: size,
