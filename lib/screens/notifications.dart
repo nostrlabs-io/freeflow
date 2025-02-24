@@ -7,7 +7,9 @@ import 'package:freeflow/main.dart';
 import 'package:freeflow/rx_filter.dart';
 import 'package:freeflow/widgets/avatar.dart';
 import 'package:freeflow/widgets/profile_name.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
+import 'package:ndk/shared/nips/nip19/nip19.dart';
 
 class NotificationsScreen extends StatefulWidget {
   NotificationsScreen({Key? key}) : super(key: key);
@@ -65,7 +67,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     } else {
                       data.sort((a, b) => b.createdAt.compareTo(a.createdAt));
                       return Column(
-                        children: data.map(_notification).nonNulls.toList(),
+                        children: data
+                            .map((e) => _notification(ctx, e))
+                            .nonNulls
+                            .toList(),
                       );
                     }
                   },
@@ -78,7 +83,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  Widget? _notification(Nip01Event ev) {
+  Widget? _notification(BuildContext context, Nip01Event ev) {
     final zap = ev.kind == 9735 ? ZapReceipt.fromEvent(ev) : null;
     final sender = ev.kind != 9735 ? ev.pubKey : zap!.sender!;
     final targetIsMe =
@@ -149,26 +154,33 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           fontWeight: FontWeight.bold,
         );
         final ev = data!.first;
-        switch (ev.kind) {
-          case 22:
-            {
-              return Text(
-                "your short",
-                style: style,
-              );
-            }
-          case 1:
-            {
-              return Text(
-                "your note",
-                style: style,
-              );
-            }
-          default:
-            {
-              return Text("Unknown kind: ${ev.kind}");
-            }
-        }
+        final child = () {
+          switch (ev.kind) {
+            case 22:
+              {
+                return Text(
+                  "your short",
+                  style: style,
+                );
+              }
+            case 1:
+              {
+                return Text(
+                  "your note",
+                  style: style,
+                );
+              }
+            default:
+              {
+                return Text("Unknown kind: ${ev.kind}");
+              }
+          }
+        }();
+        return GestureDetector(
+            onTap: () {
+              context.push("/e/${Nip19.encodeNoteId(eventId)}", extra: ev);
+            },
+            child: child);
       },
     );
   }
