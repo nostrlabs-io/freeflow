@@ -78,7 +78,6 @@ class ActionsToolbar extends StatelessWidget {
               icon: "zap",
               activeColor: Colors.red,
               kind: 9735,
-              title: 'Zap',
               onPressed: (_) {
                 showModalBottomSheet(
                   context: context,
@@ -131,7 +130,11 @@ class ActionsToolbar extends StatelessWidget {
                   Padding(
                       padding: EdgeInsets.only(top: 8),
                       child: Text(
-                        title ?? data?.length.toString() ?? "0",
+                        title ??
+                            (kind == 9735
+                                ? zapSum(data ?? [])
+                                : data?.length.toString()) ??
+                            "0",
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w500,

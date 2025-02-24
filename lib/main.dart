@@ -158,3 +158,10 @@ String formatSats(int n) {
     return "${n}";
   }
 }
+
+String zapSum(List<Nip01Event> zaps) {
+  final total = zaps
+      .map((e) => ZapReceipt.fromEvent(e))
+      .fold(0, (acc, v) => acc + (v.amountSats ?? 0));
+  return formatSats(total);
+}

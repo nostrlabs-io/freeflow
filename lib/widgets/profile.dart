@@ -92,10 +92,9 @@ class ProfileWidget extends StatelessWidget {
                     ),
                     Column(
                       children: [
-                        RxFilter<ZapReceipt>(
+                        RxFilter<Nip01Event>(
                             filter:
                                 Filter(pTags: [profile.pubKey], kinds: [9735]),
-                            mapper: (e) => ZapReceipt.fromEvent(e),
                             builder: (context, data) {
                               if (data == null) {
                                 return SizedBox(
@@ -105,8 +104,7 @@ class ProfileWidget extends StatelessWidget {
                                 );
                               }
                               return Text(
-                                formatSats(data.fold(
-                                    0, (acc, v) => acc + (v.amountSats ?? 0))),
+                                zapSum(data),
                                 style: TextStyle(
                                     fontSize: 20, fontWeight: FontWeight.bold),
                               );
