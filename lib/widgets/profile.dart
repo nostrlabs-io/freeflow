@@ -9,6 +9,7 @@ import 'package:freeflow/widgets/video_grid.dart';
 import 'package:ndk/ndk.dart';
 
 class ProfileWidget extends StatelessWidget {
+  static const TABS = [Icons.menu, Icons.favorite_border];
   final Metadata profile;
 
   ProfileWidget({required this.profile}) {}
@@ -121,75 +122,17 @@ class ProfileWidget extends StatelessWidget {
                 SizedBox(
                   height: 15,
                 ),
-                Container(
-                  height: 45,
-                  decoration:
-                      BoxDecoration(border: Border.all(color: Colors.black12)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Icon(Icons.menu),
-                          SizedBox(
-                            height: 7,
-                          ),
-                          Container(
-                            color: Colors.black,
-                            height: 2,
-                            width: 55,
-                          )
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Icon(
-                            Icons.favorite_border,
-                            color: Colors.black26,
-                          ),
-                          SizedBox(
-                            height: 7,
-                          ),
-                          Container(
-                            color: Colors.transparent,
-                            height: 2,
-                            width: 55,
-                          )
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Icon(
-                            Icons.lock_outline,
-                            color: Colors.black26,
-                          ),
-                          SizedBox(
-                            height: 7,
-                          ),
-                          Container(
-                            color: Colors.transparent,
-                            height: 2,
-                            width: 55,
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
                 Expanded(
-                  child: RxFilter<Video>(
-                    filter: Filter(
-                        kinds: SHORT_KIND,
-                        authors: [profile.pubKey],
-                        limit: 10),
-                    mapper: (e) => Video.fromEvent(e),
-                    builder: (ctx, data) {
-                      data?.sort((a, b) =>
-                          b.event.createdAt.compareTo(a.event.createdAt));
-                      return VideoGridWidget(data ?? []);
+                  child: PageView.builder(
+                    itemCount: TABS.length,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (ctx, idx) {
+                      return Column(
+                        children: [
+                          _tabHeader(idx),
+                          Expanded(child: _tabBody(idx)),
+                        ],
+                      );
                     },
                   ),
                 ),
@@ -197,6 +140,86 @@ class ProfileWidget extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _tabBody(int tab) {
+    switch (tab) {
+      case 0:
+        {
+          return RxFilter<Video>(
+            filter:
+                Filter(kinds: SHORT_KIND, authors: [profile.pubKey], limit: 50),
+            mapper: (e) => Video.fromEvent(e),
+            builder: (ctx, data) {
+              data?.sort(
+                  (a, b) => b.event.createdAt.compareTo(a.event.createdAt));
+              return VideoGridWidget(data ?? []);
+            },
+          );
+        }
+      case 1:
+        {
+          return RxFilter<Nip01Event>(
+            filter: Filter(
+              kinds: [7],
+              arbitraryTags: {
+                "#k": ["22"]
+              },
+              authors: [profile.pubKey],
+              limit: 50,
+            ),
+            builder: (ctx, data) {
+              if ((data?.length ?? 0) == 0) {
+                return SizedBox();
+              }
+              return RxFilter<Video>(
+                  filter: Filter(
+                    ids: data!.map((e) => e.getEId()).nonNulls.toList(),
+                  ),
+                  mapper: (e) => Video.fromEvent(e),
+                  builder: (ctx, data) {
+                    data?.sort((a, b) =>
+                        b.event.createdAt.compareTo(a.event.createdAt));
+                    return VideoGridWidget(data ?? []);
+                  });
+            },
+          );
+        }
+    }
+    return SizedBox();
+  }
+
+  Widget _tabHeader(int tab) {
+    return Container(
+      height: 45,
+      decoration: BoxDecoration(border: Border.all(color: Colors.black12)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: TABS
+            .asMap()
+            .entries
+            .map(
+              (t) => Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Icon(
+                    t.value,
+                    color: t.key == tab ? Colors.black : Colors.black26,
+                  ),
+                  SizedBox(
+                    height: 7,
+                  ),
+                  Container(
+                    color: t.key == tab ? Colors.black : Colors.transparent,
+                    height: 2,
+                    width: 55,
+                  )
+                ],
+              ),
+            )
+            .toList(),
       ),
     );
   }
