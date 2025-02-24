@@ -9,6 +9,7 @@ class FeedViewModel {
   int currentVideoIndex = 0;
 
   void setVideos(List<Video> vids) {
+    reset();
     videos = vids;
   }
 
