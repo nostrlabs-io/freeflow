@@ -33,6 +33,9 @@ if (flutterVersionName == null) {
 }
 
 def getKeystoreFile(String base64String, String hash, String fileName) {
+    if(base64String == null) {
+        throw new GradleException("Keystore is null")
+    }
     def decodedBytes = Base64.getDecoder().decode(base64String)
     def tempFile = new File("${buildDir}/keystores/${fileName}")
     tempFile.parentFile.mkdirs()
@@ -51,7 +54,7 @@ android {
         env {
             keyAlias System.getenv("KEY_ALIAS")
             keyPassword System.getenv("KEY_PASSWORD")
-            storeFile getKeystoreFile(System.getenv("KEYSTORE"), System.getenv("KEYSTORE_SHA256"), "store.jks")
+            storeFile System.getenv("KEYSTORE") ? getKeystoreFile(System.getenv("KEYSTORE"), System.getenv("KEYSTORE_SHA256"), "store.jks") : null
             storePassword System.getenv("KEYSTORE_PASSWORD")
         }
         keyfile {
