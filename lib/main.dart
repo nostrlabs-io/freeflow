@@ -89,7 +89,7 @@ Future<void> main() async {
             StatefulShellBranch(routes: [
               GoRoute(path: "/", builder: (context, state) => FeedScreen()),
               GoRoute(
-                path: "/profile/:pubkey",
+                path: "/p/:pubkey",
                 builder: (context, state) =>
                     ProfileScreen(pubkey: state.pathParameters["pubkey"]!),
               ),

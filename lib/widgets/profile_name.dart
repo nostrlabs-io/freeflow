@@ -21,9 +21,15 @@ class ProfileNameWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = profile.displayName ??
-        profile.name ??
-        Nip19.encodeSimplePubKey(profile.pubKey);
+    final name = () {
+      if ((profile.displayName?.length ?? 0) > 0) {
+        return profile.displayName!;
+      }
+      if ((profile.name?.length ?? 0) > 0) {
+        return profile.name!;
+      }
+      return Nip19.encodeSimplePubKey(profile.pubKey);
+    }();
 
     return Text(
       name,

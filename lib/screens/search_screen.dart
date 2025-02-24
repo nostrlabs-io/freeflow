@@ -6,6 +6,7 @@ import 'package:freeflow/widgets/avatar.dart';
 import 'package:freeflow/widgets/profile_loader.dart';
 import 'package:freeflow/widgets/profile_name.dart';
 import 'package:freeflow/widgets/video_grid.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -100,12 +101,17 @@ class _SearchScreenState extends State<SearchScreen> {
             ev.pubKey,
             (ctx, data) {
               final profile = data.data ?? Metadata(pubKey: ev.pubKey);
-              return Row(
-                spacing: 5,
-                children: [
-                  AvatarWidget(profile: profile),
-                  ProfileNameWidget(profile: profile)
-                ],
+              return GestureDetector(
+                onTap: () {
+                  ctx.push("/p/${profile.pubKey}", extra: profile);
+                },
+                child: Row(
+                  spacing: 5,
+                  children: [
+                    AvatarWidget(profile: profile),
+                    ProfileNameWidget(profile: profile)
+                  ],
+                ),
               );
             },
           );

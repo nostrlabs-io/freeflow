@@ -60,7 +60,7 @@ class BottomBar extends StatelessWidget {
                   animation: login,
                   builder: (context, data) {
                     return menuButton(context, 'Profile', "profile",
-                        login.value == null ? "/login" : "/profile/me");
+                        login.value == null ? "/login" : "/p/me");
                   }))
         ],
       ),
