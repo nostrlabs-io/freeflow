@@ -62,9 +62,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   child: SingleChildScrollView(
                     child: RxFilter<Nip01Event>(
                       key: Key("search-${_searchFilter.hashCode}"),
-                      relays: [
-                        "wss://relay.nostr.band",
-                      ],
+                      relays: SEARCH_RELAYS,
                       filter: _searchFilter!,
                       builder: (ctx, data) {
                         final shorts =

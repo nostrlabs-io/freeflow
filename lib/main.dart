@@ -47,6 +47,11 @@ const DEFAULT_RELAYS = [
   "wss://relay.damus.io",
   "wss://relay.primal.net"
 ];
+const SEARCH_RELAYS = [
+  "wss://relay.nostr.band/",
+  "wss://search.nos.today/",
+  "wss://relay.noswhere.com/"
+];
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
