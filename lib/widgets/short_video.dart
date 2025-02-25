@@ -34,6 +34,9 @@ class _ShortVideoPlayer extends State<ShortVideoPlayer> {
         await _controller!.initialize();
         await _controller!.setLooping(true);
         await _controller!.play();
+        setState(() {
+          // nothing
+        });
       }();
     } else if (widget.controller != null &&
         !widget.controller!.value.isPlaying) {
