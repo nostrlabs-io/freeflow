@@ -3,7 +3,7 @@ import 'package:freeflow/main.dart';
 import 'package:freeflow/screens/feed_screen.dart';
 import 'package:ndk/ndk.dart';
 
-enum RootTab { Following, Latest }
+enum RootTab { Following, Latest, ForYou }
 
 class RootScreen extends StatefulWidget {
   @override
@@ -15,15 +15,28 @@ class _RootScreen extends State<RootScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final acc = ndk.accounts.getPublicKey();
     return Stack(
       children: [
         FeedScreen(
           () async {
-            final acc = ndk.accounts.getPublicKey();
-            final authors = acc != null && _tab == RootTab.Following
-                ? (await ndk.follows.getContactList(acc))?.contacts
-                : null;
-            return Filter(kinds: SHORT_KIND, authors: authors, limit: 50);
+            switch (_tab) {
+              case RootTab.Following:
+                {
+                  final authors =
+                      (await ndk.follows.getContactList(acc!))?.contacts;
+                  return Filter(kinds: SHORT_KIND, authors: authors, limit: 50);
+                }
+              case RootTab.Latest:
+                {
+                  return Filter(kinds: SHORT_KIND, limit: 50);
+                }
+              case RootTab.ForYou:
+                {
+                  // TODO: DVM call
+                  return Filter(kinds: SHORT_KIND, limit: 50);
+                }
+            }
           },
           key: Key(
             "root-tab:${_tab}",
@@ -36,8 +49,11 @@ class _RootScreen extends State<RootScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               spacing: 10,
-              children:
-                  [RootTab.Following, RootTab.Latest].map(_tabWidget).toList(),
+              children: (acc != null
+                      ? [RootTab.Following, RootTab.Latest]
+                      : [RootTab.Latest])
+                  .map(_tabWidget)
+                  .toList(),
             ),
           ),
         ),

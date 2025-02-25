@@ -40,7 +40,7 @@ dependency_overrides:
     git:
       url: https://github.com/relaystr/ndk
       path: packages/ndk
-      ref: a6f003e8f475fd18a19982eb2b546f229678e8b2
+      ref: 60aae4b120bf9248b9b1534e8615bfc6095406e5
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.3"
