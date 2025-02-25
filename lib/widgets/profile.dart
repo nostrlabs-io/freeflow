@@ -164,8 +164,8 @@ class ProfileWidget extends StatelessWidget {
           return RxFilter<Nip01Event>(
             filter: Filter(
               kinds: [7],
-              arbitraryTags: {
-                "#k": ["22"]
+              tags: {
+                "#k": SHORT_KIND.map((e) => e.toString()).toList()
               },
               authors: [profile.pubKey],
               limit: 50,

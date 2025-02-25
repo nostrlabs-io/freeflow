@@ -55,7 +55,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 child: RxFilter<Nip01Event>(
                   filter: Filter(
                     pTags: [ndk.accounts.getPublicKey() ?? ""],
-                    arbitraryTags: {
+                    tags: {
                       "#k": SHORT_KIND.map((v) => v.toString()).toList()
                     },
                     kinds: [1111, 9735, 7],

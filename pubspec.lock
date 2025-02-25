@@ -567,11 +567,11 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/ndk"
-      ref: "62b6906c3224ca52c6c999094f9c6d835e9ef439"
-      resolved-ref: "62b6906c3224ca52c6c999094f9c6d835e9ef439"
+      ref: a6f003e8f475fd18a19982eb2b546f229678e8b2
+      resolved-ref: a6f003e8f475fd18a19982eb2b546f229678e8b2
       url: "https://github.com/relaystr/ndk"
     source: git
-    version: "0.2.6"
+    version: "0.3.0"
   ndk_amber:
     dependency: "direct main"
     description:
