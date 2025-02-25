@@ -10,18 +10,17 @@ import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 class FeedScreen extends StatefulWidget {
-  FeedScreen({Key? key}) : super(key: key);
+  final Future<Filter> Function() feedBuilder;
+
+  FeedScreen(this.feedBuilder, {Key? key}) : super(key: key);
 
   @override
   _FeedScreenState createState() => _FeedScreenState();
 }
 
-enum FeedTab { Following, Latest }
-
 class _FeedScreenState extends State<FeedScreen> {
   Map<String, VideoPlayerController> _contollers = Map();
   PageController _videoPage = PageController();
-  FeedTab _tab = FeedTab.Latest;
 
   @override
   void initState() {
@@ -71,21 +70,11 @@ class _FeedScreenState extends State<FeedScreen> {
     return null;
   }
 
-  /**
-   * Main player scroller
-   */
-  Widget _tabPlayer() {
-    final acc = ndk.accounts.getPublicKey();
+  Widget build(BuildContext context) {
     return RxFutureFilter<Video>(
-      key: Key("feed-view:${_tab.name}"),
       leaveOpen: false,
       mapper: (e) => Video.fromEvent(e),
-      filterBuilder: () async {
-        final authors = acc != null && _tab == FeedTab.Following
-            ? (await ndk.follows.getContactList(acc))?.contacts
-            : null;
-        return Filter(kinds: SHORT_KIND, authors: authors, limit: 50);
-      },
+      filterBuilder: widget.feedBuilder,
       builder: (ctx, data) {
         final videos = data;
         if (videos != null) {
@@ -147,75 +136,6 @@ class _FeedScreenState extends State<FeedScreen> {
           },
         );
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final acc = ndk.accounts.getPublicKey();
-    return Stack(
-      children: [
-        _tabPlayer(),
-        SafeArea(
-          child: Container(
-            padding: EdgeInsets.only(top: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                ...(acc != null
-                    ? [
-                        GestureDetector(
-                          onTap: () => setState(() {
-                            _tab = FeedTab.Following;
-                          }),
-                          child: Text(
-                            'Following',
-                            style: TextStyle(
-                                fontSize: 17.0,
-                                fontWeight: _tab == FeedTab.Following
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: _tab == FeedTab.Following
-                                    ? Colors.white
-                                    : Colors.white70),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 7,
-                        ),
-                        Container(
-                          color: Colors.white70,
-                          height: 10,
-                          width: 1.0,
-                        ),
-                        SizedBox(
-                          width: 7,
-                        ),
-                      ]
-                    : []),
-                GestureDetector(
-                  onTap: () => setState(() {
-                    _tab = FeedTab.Latest;
-                  }),
-                  child: Text(
-                    "Latest",
-                    style: TextStyle(
-                      fontSize: 17.0,
-                      fontWeight: _tab == FeedTab.Latest
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                      color: _tab == FeedTab.Latest
-                          ? Colors.white
-                          : Colors.white70,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
     );
   }
 

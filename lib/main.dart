@@ -5,12 +5,12 @@ import 'package:freeflow/data/video.dart';
 import 'package:freeflow/rx_filter.dart';
 import 'package:freeflow/screens/create.dart';
 import 'package:freeflow/screens/create_preview.dart';
-import 'package:freeflow/screens/feed_screen.dart';
 import 'package:freeflow/screens/layout.dart';
 import 'package:freeflow/screens/login.dart';
 import 'package:freeflow/screens/notifications.dart';
 import 'package:freeflow/screens/new_account.dart';
 import 'package:freeflow/screens/profile_screen.dart';
+import 'package:freeflow/screens/root.dart';
 import 'package:freeflow/screens/search_screen.dart';
 import 'package:freeflow/view_model/login.dart';
 import 'package:freeflow/widgets/short_video.dart';
@@ -87,7 +87,10 @@ Future<void> main() async {
               SafeArea(child: LayoutScreen(navigationShell), top: false),
           branches: [
             StatefulShellBranch(routes: [
-              GoRoute(path: "/", builder: (context, state) => FeedScreen()),
+              GoRoute(
+                path: "/",
+                builder: (context, state) => RootScreen(),
+              ),
               GoRoute(
                 path: "/p/:pubkey",
                 builder: (context, state) =>
