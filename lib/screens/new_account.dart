@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/view_model/login.dart';
 import 'package:freeflow/widgets/button.dart';
-import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ndk/domain_layer/entities/metadata.dart';
@@ -57,9 +56,8 @@ class _NewAccountScreen extends State<NewAccountScreen> {
             ),
             BasicButton.text("Login", onTap: () {
               _login().then((_) {
-                GetIt.I.get<LoginData>().value =
-                    Account.privateKeyHex(_privateKey.privateKey!);
-                context.push("/");
+                LOGIN.value = Account.privateKeyHex(_privateKey.privateKey!);
+                context.go("/");
               }).catchError((e) {
                 setState(() {
                   if (e is String) {
@@ -76,7 +74,8 @@ class _NewAccountScreen extends State<NewAccountScreen> {
   }
 
   Future<void> _uploadAvatar() async {
-    ndk.accounts.loginPrivateKey(pubkey: _privateKey.publicKey, privkey: _privateKey.privateKey!);
+    ndk.accounts.loginPrivateKey(
+        pubkey: _privateKey.publicKey, privkey: _privateKey.privateKey!);
 
     final file = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (file != null) {

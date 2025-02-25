@@ -3,9 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/screens/create.dart';
-import 'package:freeflow/view_model/login.dart';
 import 'package:freeflow/widgets/button.dart';
-import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
@@ -105,7 +103,8 @@ class _CreatePreview extends State<CreatePreview> {
                     if (_description.text.length > 4 && _finalFile != null) {
                       _postShort(_description.text, _finalFile!, _videoServer)
                           .then((e) {
-                        context.push("/e/${Nip19.encodeNoteId(e.id)}", extra: e);
+                        context.push("/e/${Nip19.encodeNoteId(e.id)}",
+                            extra: e);
                       }).catchError((e) {
                         setState(() {
                           _error = e.toString();
@@ -124,7 +123,7 @@ class _CreatePreview extends State<CreatePreview> {
 
   Future<Nip01Event> _postShort(
       String description, MediaInfo videoFile, String server) async {
-    final acc = GetIt.I.get<LoginData>().value;
+    final acc = ndk.accounts.getPublicKey();
     if (acc == null) {
       throw "Not logged in";
     }
@@ -140,18 +139,22 @@ class _CreatePreview extends State<CreatePreview> {
     if (mainUpload.descriptor == null) {
       throw mainUpload.error!;
     }
-    final ev =
-        Nip01Event(pubKey: acc.pubkey, kind: 22, content: description, tags: [
-      [
-        "imeta",
-        "url ${mainUpload.descriptor!.url}",
-        "dim ${videoFile.width}x${videoFile.height}",
-        "duration ${(videoFile.duration ?? 0) / 1000}",
-        "x ${mainUpload.descriptor!.sha256}",
-        "m ${mainUpload.descriptor!.type}",
-        "size ${mainUpload.descriptor!.size}"
-      ]
-    ]);
+    final ev = Nip01Event(
+      pubKey: acc,
+      kind: 22,
+      content: description,
+      tags: [
+        [
+          "imeta",
+          "url ${mainUpload.descriptor!.url}",
+          "dim ${videoFile.width}x${videoFile.height}",
+          "duration ${(videoFile.duration ?? 0) / 1000}",
+          "x ${mainUpload.descriptor!.sha256}",
+          "m ${mainUpload.descriptor!.type}",
+          "size ${mainUpload.descriptor!.size}"
+        ]
+      ],
+    );
 
     print(ev);
     await ndk.broadcast

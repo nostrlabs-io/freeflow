@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:amberflutter/amberflutter.dart';
 import 'package:flutter/material.dart';
+import 'package:freeflow/main.dart';
 import 'package:freeflow/view_model/login.dart';
 import 'package:freeflow/widgets/button.dart';
-import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 
@@ -61,9 +61,8 @@ class _LoginScreen extends State<LoginScreen> {
                     onTap: () {
                       final keyData = Nip19.decode(_key.text);
                       if (keyData.length > 0) {
-                        GetIt.I.get<LoginData>().value =
-                            Account.nip19(_key.text);
-                        context.push("/");
+                        LOGIN.value = Account.nip19(_key.text);
+                        context.go("/");
                       }
                     },
                   ),
@@ -108,9 +107,8 @@ class _LoginScreen extends State<LoginScreen> {
                             final result = await amber.getPublicKey();
                             if (result['signature'] != null) {
                               final key = Nip19.decode(result['signature']);
-                              GetIt.I.get<LoginData>().value =
-                                  Account.externalPublicKeyHex(key);
-                              context.push("/");
+                              LOGIN.value = Account.externalPublicKeyHex(key);
+                              context.go("/");
                             }
                           },
                         ),

@@ -1,9 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/widgets.dart';
 import 'package:freeflow/data/video.dart';
-import 'package:freeflow/imgproxy.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/widgets/actions_toolbar.dart';
+import 'package:freeflow/widgets/short_video_placeholder.dart';
 import 'package:freeflow/widgets/video_description.dart';
 import 'package:ndk/ndk.dart';
 import 'package:video_player/video_player.dart';
@@ -20,6 +19,35 @@ class ShortVideoPlayer extends StatefulWidget {
 
 class _ShortVideoPlayer extends State<ShortVideoPlayer> {
   VideoPlayerController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.controller == null && widget.video.url != null) {
+      if (_controller != null) {
+        _controller!.dispose();
+      }
+      _controller = VideoPlayerController.networkUrl(
+          Uri.parse(widget.video.url!),
+          httpHeaders: Map.from({"user-agent": USER_AGENT}));
+      () async {
+        await _controller!.initialize();
+        await _controller!.setLooping(true);
+        await _controller!.play();
+      }();
+    } else if (widget.controller != null &&
+        !widget.controller!.value.isPlaying) {
+      widget.controller!.play();
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (_controller != null) {
+      _controller!.dispose();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,15 +74,7 @@ class _ShortVideoPlayer extends State<ShortVideoPlayer> {
                     child: VideoPlayer(con),
                   ),
                 ))
-              : SizedBox.expand(
-                  child: FittedBox(
-                    fit: BoxFit.cover,
-                    child: CachedNetworkImage(
-                      imageUrl: proxyImg(context,
-                          widget.video.image ?? widget.video.url ?? ""),
-                    ),
-                  ),
-                ),
+              : ShortVideoPlaceholder(widget.video),
         ),
         FutureBuilder(
           future: ndk.metadata.loadMetadata(widget.video.user),

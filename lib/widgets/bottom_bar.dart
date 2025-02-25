@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:freeflow/view_model/login.dart';
-import 'package:get_it/get_it.dart';
+import 'package:freeflow/main.dart';
 import 'package:go_router/go_router.dart';
 
 class BottomBar extends StatelessWidget {
@@ -43,7 +42,6 @@ class BottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final login = GetIt.I.get<LoginData>();
     return Container(
       margin: EdgeInsets.only(top: 10, bottom: 2),
       child: Row(
@@ -56,12 +54,14 @@ class BottomBar extends StatelessWidget {
           ),
           Expanded(child: menuButton(context, 'Inbox', "inbox", "/messages")),
           Expanded(
-              child: AnimatedBuilder(
-                  animation: login,
-                  builder: (context, data) {
-                    return menuButton(context, 'Profile', "profile",
-                        login.value == null ? "/login" : "/p/me");
-                  }))
+            child: AnimatedBuilder(
+              animation: LOGIN,
+              builder: (context, data) {
+                return menuButton(context, 'Profile', "profile",
+                    LOGIN.value == null ? "/login" : "/p/me");
+              },
+            ),
+          )
         ],
       ),
     );

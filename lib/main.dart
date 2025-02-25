@@ -12,10 +12,8 @@ import 'package:freeflow/screens/notifications.dart';
 import 'package:freeflow/screens/new_account.dart';
 import 'package:freeflow/screens/profile_screen.dart';
 import 'package:freeflow/screens/search_screen.dart';
-import 'package:freeflow/view_model/feed_viewmodel.dart';
 import 'package:freeflow/view_model/login.dart';
 import 'package:freeflow/widgets/short_video.dart';
-import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
@@ -53,37 +51,34 @@ const SEARCH_RELAYS = [
   "wss://relay.noswhere.com/"
 ];
 
+final LOGIN = LoginData();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final l = LoginData();
-
   // reload / cache login data
-  l.addListener(() {
-    if (l.value != null) {
-      if (!ndk.accounts.hasAccount(l.value!.pubkey)) {
-        switch (l.value!.type) {
+  LOGIN.addListener(() {
+    if (LOGIN.value != null) {
+      if (!ndk.accounts.hasAccount(LOGIN.value!.pubkey)) {
+        switch (LOGIN.value!.type) {
           case AccountType.privateKey:
             ndk.accounts.loginPrivateKey(
-                pubkey: l.value!.pubkey, privkey: l.value!.privateKey!);
+                pubkey: LOGIN.value!.pubkey, privkey: LOGIN.value!.privateKey!);
           case AccountType.externalSigner:
             ndk.accounts.loginExternalSigner(
                 signer: AmberEventSigner(
-                    publicKey: l.value!.pubkey,
+                    publicKey: LOGIN.value!.pubkey,
                     amberFlutterDS: AmberFlutterDS(Amberflutter())));
           case AccountType.publicKey:
-            ndk.accounts.loginPublicKey(pubkey: l.value!.pubkey);
+            ndk.accounts.loginPublicKey(pubkey: LOGIN.value!.pubkey);
         }
       }
-      ndk.metadata.loadMetadata(l.value!.pubkey);
-      ndk.follows.getContactList(l.value!.pubkey);
+      ndk.metadata.loadMetadata(LOGIN.value!.pubkey);
+      ndk.follows.getContactList(LOGIN.value!.pubkey);
     }
   });
 
-  await l.load();
-
-  GetIt.I.registerSingleton<FeedViewModel>(FeedViewModel());
-  GetIt.I.registerSingleton<LoginData>(l);
+  await LOGIN.load();
 
   runApp(MaterialApp.router(
     routerConfig: GoRouter(routes: [

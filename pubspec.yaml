@@ -12,7 +12,6 @@ dependencies:
   flutter:
     sdk: flutter
   video_player: ^2.9.2
-  get_it: ^8.0.3
   cached_network_image: ^3.4.1
   ndk: ^0.2.6
   ndk_objectbox: ^0.2.1
