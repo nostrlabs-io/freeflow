@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:freeflow/data/video.dart';
@@ -150,7 +152,7 @@ class _CommentsWidget extends State<CommentsWidget> {
           ["p", widget.video.user],
         ]);
 
-    print(ev);
+    developer.log(ev.toString());
     await ndk.broadcast
         .broadcast(nostrEvent: ev, specificRelays: DEFAULT_RELAYS);
     return ev;

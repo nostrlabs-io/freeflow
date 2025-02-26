@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -44,7 +45,7 @@ class _CreatePreview extends State<CreatePreview> {
     final res = await VideoCompress.compressVideo(
         widget.segments.map((s) => s.file.path).toList());
     if (res == null) {
-      print("Transcoding failed");
+      developer.log("Transcoding failed");
       sub.unsubscribe();
       return;
     }
@@ -156,7 +157,7 @@ class _CreatePreview extends State<CreatePreview> {
       ],
     );
 
-    print(ev);
+    developer.log(ev.toString());
     await ndk.broadcast
         .broadcast(nostrEvent: ev, specificRelays: DEFAULT_RELAYS);
     return ev;

@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
@@ -27,7 +29,7 @@ class _FeedScreenState extends State<FeedScreen> {
     super.initState();
     WakelockPlus.enable();
   }
-  
+
   Video? _getVideo(List<Video>? videos, int index) {
     final i = index % (videos?.length ?? 1);
     return videos?[i];
@@ -46,7 +48,7 @@ class _FeedScreenState extends State<FeedScreen> {
       }
     }
     for (final rem in toRemove) {
-      print("PLAYER: removing ${rem}");
+      developer.log("PLAYER: removing ${rem}");
       final c = _contollers.remove(rem);
       c?.dispose();
     }
@@ -58,7 +60,7 @@ class _FeedScreenState extends State<FeedScreen> {
       if (existing != null) {
         return existing;
       } else {
-        print("PLAYER: loading ${vid.url}");
+        developer.log("PLAYER: loading ${vid.url}");
         final c = VideoPlayerController.networkUrl(Uri.parse(vid.url!));
         _contollers[vid.url!] = c;
         await c.initialize();

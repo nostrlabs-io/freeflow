@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:freeflow/widgets/button.dart';
@@ -159,9 +161,9 @@ class _CreateShortScreen extends State<CreateShortScreen> {
             setState(() {
               recording_start = DateTime.now().millisecondsSinceEpoch;
             });
-            print("Recording started");
+            developer.log("Recording started");
           }).catchError((e) {
-            print("recording error ${e}");
+            developer.log("recording error ${e}");
           });
         }
       },

@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:developer' as developer;
 
 import 'package:flutter/widgets.dart';
 import 'package:freeflow/main.dart';
@@ -35,7 +36,7 @@ class _RxFilter<T> extends State<RxFilter<T>> {
   @override
   void initState() {
     super.initState();
-    print("RX:SEDNING ${widget.filter}");
+    developer.log("RX:SEDNING ${widget.filter}");
     _response = ndk.requests.subscription(
       filters: [widget.filter],
       cacheRead: true,
@@ -44,7 +45,7 @@ class _RxFilter<T> extends State<RxFilter<T>> {
     );
     if (!widget.leaveOpen) {
       _response.future.then((_) {
-        print("RX:CLOSING ${widget.filter}");
+        developer.log("RX:CLOSING ${widget.filter}");
         ndk.requests.closeSubscription(_response.requestId);
       });
     }
@@ -52,12 +53,12 @@ class _RxFilter<T> extends State<RxFilter<T>> {
         .bufferTime(const Duration(milliseconds: 500))
         .where((events) => events.isNotEmpty)
         .handleError((e) {
-          print("RX:ERROR ${e}");
+          developer.log("RX:ERROR ${e}");
         })
         .listen((events) {
       setState(() {
         _events ??= HashMap();
-        print("RX:GOT ${events.length} events for ${widget.filter}");
+        developer.log("RX:GOT ${events.length} events for ${widget.filter}");
         events.forEach(_replaceInto);
       });
     });
@@ -86,7 +87,7 @@ class _RxFilter<T> extends State<RxFilter<T>> {
   void dispose() {
     super.dispose();
 
-    print("RX:CLOSING ${widget.filter}");
+    developer.log("RX:CLOSING ${widget.filter}");
     ndk.requests.closeSubscription(_response.requestId);
   }
 

@@ -28,7 +28,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           children: [
             Container(
               decoration: BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Colors.black12))),
+                border: Border(
+                  bottom: BorderSide(color: Colors.black12),
+                ),
+              ),
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -55,9 +58,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 child: RxFilter<Nip01Event>(
                   filter: Filter(
                     pTags: [ndk.accounts.getPublicKey() ?? ""],
-                    tags: {
-                      "#k": SHORT_KIND.map((v) => v.toString()).toList()
-                    },
+                    tags: {"#k": SHORT_KIND.map((v) => v.toString()).toList()},
                     kinds: [1111, 9735, 7],
                     limit: 20,
                   ),
