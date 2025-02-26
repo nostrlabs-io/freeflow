@@ -147,8 +147,6 @@ class _FeedScreenState extends State<FeedScreen> {
     final ModalRoute? route = ModalRoute.of(context);
     if (!(route?.isCurrent ?? false)) {
       _contollers.values.forEach((c) => c.pause());
-    } else {
-
     }
   }
 
