@@ -3,7 +3,7 @@ description: A TikTok client built for Nostr
 
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 0.1.6+11
+version: 0.1.7+12
 
 environment:
   sdk: ">=3.4.0 < 4.0.0"
@@ -38,9 +38,9 @@ dependencies:
 dependency_overrides:
   ndk:
     git:
-      url: https://github.com/relaystr/ndk
+      url: https://github.com/v0l/ndk
       path: packages/ndk
-      ref: 60aae4b120bf9248b9b1534e8615bfc6095406e5
+      ref: 875253bcd3ff67c3ed2798834ec42d5f18687cf9
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.3"

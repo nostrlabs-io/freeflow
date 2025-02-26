@@ -25,6 +25,7 @@ class _CreatePreview extends State<CreatePreview> {
   MediaInfo? _finalFile;
   double _progress = 0;
   String? _error;
+  Subscription? _progressSub;
   TextEditingController _description = TextEditingController();
   static String _videoServer = "https://nostr.download";
 
@@ -33,11 +34,15 @@ class _CreatePreview extends State<CreatePreview> {
     super.initState();
 
     // concat segments and load player
-    _concatSegments();
+    _concatSegments().catchError((e) {
+      setState(() {
+        _error = e.toString();
+      });
+    });
   }
 
   Future<void> _concatSegments() async {
-    final sub = VideoCompress.compressProgress$.subscribe((d) {
+    _progressSub = VideoCompress.compressProgress$.subscribe((d) {
       setState(() {
         _progress = d;
       });
@@ -46,13 +51,15 @@ class _CreatePreview extends State<CreatePreview> {
         widget.segments.map((s) => s.file.path).toList());
     if (res == null) {
       developer.log("Transcoding failed");
-      sub.unsubscribe();
+      _progressSub?.unsubscribe();
+      _progressSub = null;
       return;
     }
     setState(() {
       _finalFile = res;
     });
-    sub.unsubscribe();
+    _progressSub?.unsubscribe();
+    _progressSub = null;
     controller = VideoPlayerController.file(File(res.path!));
     controller!.setLooping(true);
     await controller!.initialize();
@@ -133,9 +140,10 @@ class _CreatePreview extends State<CreatePreview> {
     });
 
     final upload = await ndk.blossom.uploadBlob(
-        data: await videoFile.file!.readAsBytes(),
-        serverUrls: [server],
-        contentType: "video/mp4");
+      data: await videoFile.file!.readAsBytes(),
+      serverUrls: [server],
+      contentType: "video/mp4",
+    );
     final mainUpload = upload.first;
     if (mainUpload.descriptor == null) {
       throw mainUpload.error!;
@@ -182,5 +190,6 @@ class _CreatePreview extends State<CreatePreview> {
   void dispose() {
     super.dispose();
     controller?.dispose();
+    _progressSub?.unsubscribe();
   }
 }
