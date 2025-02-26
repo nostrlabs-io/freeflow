@@ -27,7 +27,7 @@ class _FeedScreenState extends State<FeedScreen> {
     super.initState();
     WakelockPlus.enable();
   }
-
+  
   Video? _getVideo(List<Video>? videos, int index) {
     final i = index % (videos?.length ?? 1);
     return videos?[i];
@@ -140,9 +140,14 @@ class _FeedScreenState extends State<FeedScreen> {
   }
 
   @override
-  void deactivate() {
-    super.deactivate();
-    _contollers.values.forEach((c) => c.pause());
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final ModalRoute? route = ModalRoute.of(context);
+    if (!(route?.isCurrent ?? false)) {
+      _contollers.values.forEach((c) => c.pause());
+    } else {
+
+    }
   }
 
   @override
@@ -150,5 +155,6 @@ class _FeedScreenState extends State<FeedScreen> {
     super.dispose();
     WakelockPlus.disable();
     _contollers.values.forEach((c) => c.dispose());
+    _contollers.clear();
   }
 }
