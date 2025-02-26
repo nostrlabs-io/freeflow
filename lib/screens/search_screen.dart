@@ -33,7 +33,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   bottom: BorderSide(color: Colors.black12),
                 ),
               ),
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.black12,
@@ -42,7 +42,6 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 ),
                 alignment: AlignmentDirectional.center,
-                height: 40,
                 child: TextField(
                   onSubmitted: (v) {
                     setState(() {
@@ -51,37 +50,50 @@ class _SearchScreenState extends State<SearchScreen> {
                     });
                   },
                   controller: _search,
-                  decoration: InputDecoration.collapsed(hintText: "Search"),
+                  decoration: InputDecoration(
+                    hintText: "Search",
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 5),
+                  ),
                 ),
               ),
             ),
             if (_searchFilter != null)
               Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 15),
-                  child: SingleChildScrollView(
-                    child: RxFilter<Nip01Event>(
-                      key: Key("search-${_searchFilter.hashCode}"),
-                      relays: SEARCH_RELAYS,
-                      filter: _searchFilter!,
-                      builder: (ctx, data) {
-                        final shorts =
-                            data?.where((e) => SHORT_KIND.contains(e.kind));
-                        final profiles = data?.where((e) => e.kind == 0);
-                        return Column(
-                          spacing: 5,
-                          children: [
-                            Text("${data?.length ?? 0} results"),
-                            if ((shorts?.length ?? 0) > 0)
-                              VideoGridWidget(data
-                                      ?.map((e) => Video.fromEvent(e))
-                                      .toList() ??
-                                  []),
-                            ...(profiles?.map(_searchRow).nonNulls ?? [])
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(5),
+                  child: RxFilter<Nip01Event>(
+                    key: Key("search-${_searchFilter.hashCode}"),
+                    relays: SEARCH_RELAYS,
+                    filter: _searchFilter!,
+                    builder: (ctx, data) {
+                      final shorts =
+                          data?.where((e) => SHORT_KIND.contains(e.kind));
+                      final profiles = data?.where((e) => e.kind == 0);
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        spacing: 5,
+                        children: [
+                          if ((shorts?.length ?? 0) > 0) ...[
+                            Text("${shorts?.length ?? 0} shorts"),
+                            VideoGridWidget(
+                              shorts?.map((e) => Video.fromEvent(e)).toList() ??
+                                  [],
+                              cols: 2,
+                              title: (v) => Text(
+                                v.videoTitle,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ],
-                        );
-                      },
-                    ),
+                          if (profiles?.isNotEmpty ?? false) ...[
+                            Text("${profiles?.length} profiles"),
+                            ...profiles?.map(_searchRow).nonNulls ?? [],
+                          ]
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),
