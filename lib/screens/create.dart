@@ -4,6 +4,8 @@ import 'package:freeflow/widgets/button.dart';
 import 'package:freeflow/widgets/record_button.dart';
 import 'package:freeflow/widgets/timer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:video_compress/video_compress.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 class CreateShortScreen extends StatefulWidget {
@@ -19,6 +21,7 @@ class RecordingSegment {
 }
 
 class _CreateShortScreen extends State<CreateShortScreen> {
+  String? _error;
   CameraController? controller;
   int camera = -1;
   CameraDescription? current_camera;
@@ -60,6 +63,28 @@ class _CreateShortScreen extends State<CreateShortScreen> {
       });
   }
 
+  Future<void> _addClip() async {
+    final clip = await ImagePicker().pickVideo(source: ImageSource.gallery);
+    if (clip != null) {
+      final info = await VideoCompress.getMediaInfo(clip.path);
+      final aspect = 1 + (info.height ?? 1) / (info.width ?? 1);
+      final cam_aspect = controller?.value.aspectRatio ?? 0;
+      if ((cam_aspect - aspect).abs() > 0.5) {
+        setState(() {
+          _error = "Clip aspect ratio doesnt match camera aspect";
+        });
+      } else {
+        setState(() {
+          _error = null;
+          clips = List.from([
+            ...clips,
+            RecordingSegment(clip, (info.duration ?? 10000) / 1000)
+          ]);
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -76,18 +101,25 @@ class _CreateShortScreen extends State<CreateShortScreen> {
                       children: [
                         Stack(
                           children: [
-                            IconButton.filled(
-                              color: Color.fromARGB(255, 255, 255, 255),
-                              onPressed: () => _cycleCamera(),
-                              icon: Icon(Icons.cameraswitch),
-                            ),
+                            Row(children: [
+                              IconButton.filled(
+                                color: Color.fromARGB(255, 255, 255, 255),
+                                onPressed: () => _cycleCamera(),
+                                icon: Icon(Icons.cameraswitch),
+                              ),
+                              IconButton.filled(
+                                color: Color.fromARGB(255, 255, 255, 255),
+                                onPressed: () => _addClip(),
+                                icon: Icon(Icons.upload_file),
+                              ),
+                            ]),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 BasicButton.text(
                                   "Next",
-                                  onTap: () =>
-                                      context.push("/create/preview", extra: clips),
+                                  onTap: () => context.push("/create/preview",
+                                      extra: clips),
                                   fontSize: 16,
                                   margin: EdgeInsets.only(right: 5),
                                 ),

@@ -44,15 +44,20 @@ class _RxFilter<T> extends State<RxFilter<T>> {
     );
     if (!widget.leaveOpen) {
       _response.future.then((_) {
+        print("RX:CLOSING ${widget.filter}");
         ndk.requests.closeSubscription(_response.requestId);
       });
     }
     _response.stream
         .bufferTime(const Duration(milliseconds: 500))
         .where((events) => events.isNotEmpty)
+        .handleError((e) {
+          print("RX:ERROR ${e}");
+        })
         .listen((events) {
       setState(() {
         _events ??= HashMap();
+        print("RX:GOT ${events.length} events for ${widget.filter}");
         events.forEach(_replaceInto);
       });
     });
