@@ -5,32 +5,53 @@ import 'package:freeflow/imgproxy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
 
-class VideoGridWidget extends StatelessWidget {
-  final List<Video> events;
+typedef VideoWidgetBuilder = Widget Function(Video);
 
-  VideoGridWidget(this.events);
+class VideoGridWidget extends StatelessWidget {
+  final int cols;
+  final double spacing;
+  final double aspect;
+  final List<Video> events;
+  final VideoWidgetBuilder? title;
+
+  VideoGridWidget(
+    this.events, {
+    this.title,
+    this.cols = 4,
+    this.aspect = 10 / 16,
+    this.spacing = 2,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-        shrinkWrap: true,
+    return Container(
+      height: _calculateHeight(context),
+      child: GridView.builder(
         itemCount: events.length,
+        physics: NeverScrollableScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          crossAxisSpacing: 2,
-          mainAxisSpacing: 2,
-          childAspectRatio: 10 / 16,
+          crossAxisCount: cols,
+          crossAxisSpacing: spacing,
+          mainAxisSpacing: spacing,
+          childAspectRatio: aspect,
         ),
         itemBuilder: (ctx, idx) {
-          if (events.length >= idx) {
-            return _videoTile(
-              ctx,
-              events[idx],
-            );
-          } else {
-            return null;
-          }
-        });
+          return _videoTile(
+            ctx,
+            events[idx],
+          );
+        },
+      ),
+    );
+  }
+
+  double _calculateHeight(BuildContext context) {
+    if (events.length == 0) return 0;
+    final rowCount = (events.length / cols).ceil();
+    final cellWidth =
+        (MediaQuery.of(context).size.width - (cols - 1) * spacing) / cols;
+    final cellHeight = cellWidth / aspect;
+    return rowCount * cellHeight + (rowCount - 1) * spacing;
   }
 
   Widget _videoTile(BuildContext context, Video v) {
@@ -38,18 +59,30 @@ class VideoGridWidget extends StatelessWidget {
       onTap: () {
         context.push("/e/${Nip19.encodeNoteId(v.id)}", extra: v.event);
       },
-      child: Container(
-        decoration: BoxDecoration(
-            color: Colors.black26,
-            border: Border.all(color: Colors.white70, width: .5)),
-        child: CachedNetworkImage(
-          fit: BoxFit.cover,
-          imageUrl: proxyImg(context, v.image ?? v.url ?? "", resize: 160),
-          placeholder: (context, url) => Center(
-            child: CircularProgressIndicator(),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black26,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: CachedNetworkImage(
+                fit: BoxFit.cover,
+                imageUrl:
+                    proxyImg(context, v.image ?? v.url ?? "", resize: 160),
+                placeholder: (context, url) => Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+              ),
+            ),
           ),
-          errorWidget: (context, url, error) => Icon(Icons.error),
-        ),
+          if (title != null) title!(v),
+        ],
       ),
     );
   }

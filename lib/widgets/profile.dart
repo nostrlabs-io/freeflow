@@ -130,7 +130,11 @@ class ProfileWidget extends StatelessWidget {
                       return Column(
                         children: [
                           _tabHeader(idx),
-                          Expanded(child: _tabBody(idx)),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: _tabBody(idx),
+                            ),
+                          ),
                         ],
                       );
                     },
@@ -164,9 +168,7 @@ class ProfileWidget extends StatelessWidget {
           return RxFilter<Nip01Event>(
             filter: Filter(
               kinds: [7],
-              tags: {
-                "#k": SHORT_KIND.map((e) => e.toString()).toList()
-              },
+              tags: {"#k": SHORT_KIND.map((e) => e.toString()).toList()},
               authors: [profile.pubKey],
               limit: 50,
             ),
