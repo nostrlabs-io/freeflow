@@ -28,7 +28,9 @@ class _CommentsWidget extends State<CommentsWidget> {
     return Container(
       padding: EdgeInsets.all(10),
       child: RxFilter<Nip01Event>(
-        filter: Filter(kinds: [1111], eTags: [widget.video.id]),
+        filters: [
+          Filter(kinds: [1111], eTags: [widget.video.id])
+        ],
         builder: (context, data) {
           data?.sort((a, b) => b.createdAt.compareTo(a.createdAt));
           return Column(

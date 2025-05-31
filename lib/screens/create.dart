@@ -114,6 +114,11 @@ class _CreateShortScreen extends State<CreateShortScreen> {
                                 onPressed: () => _addClip(),
                                 icon: Icon(Icons.upload_file),
                               ),
+                              IconButton.filled(
+                                color: Color.fromARGB(255, 255, 255, 255),
+                                onPressed: () => context.push("/mirror"),
+                                icon: Icon(Icons.content_copy_sharp),
+                              ),
                             ]),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,

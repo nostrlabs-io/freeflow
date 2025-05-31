@@ -12,7 +12,7 @@ import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 class FeedScreen extends StatefulWidget {
-  final Future<Filter> Function() feedBuilder;
+  final Future<List<Filter>> Function() feedBuilder;
 
   FeedScreen(this.feedBuilder, {Key? key}) : super(key: key);
 

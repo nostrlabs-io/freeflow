@@ -25,16 +25,18 @@ class _RootScreen extends State<RootScreen> {
                 {
                   final authors =
                       (await ndk.follows.getContactList(acc!))?.contacts;
-                  return Filter(kinds: SHORT_KIND, authors: authors, limit: 50);
+                  return [
+                    Filter(kinds: SHORT_KIND, authors: authors, limit: 50)
+                  ];
                 }
               case RootTab.Latest:
                 {
-                  return Filter(kinds: SHORT_KIND, limit: 50);
+                  return [Filter(kinds: SHORT_KIND, limit: 50)];
                 }
               case RootTab.ForYou:
                 {
                   // TODO: DVM call
-                  return Filter(kinds: SHORT_KIND, limit: 50);
+                  return [Filter(kinds: SHORT_KIND, limit: 50)];
                 }
             }
           },

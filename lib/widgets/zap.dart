@@ -141,7 +141,7 @@ class _ZapWidget extends State<ZapWidget> {
             relays: DEFAULT_RELAYS)
         : null;
 
-    final invoice = await ndk.zaps.fecthInvoice(
+    final invoice = await ndk.zaps.fetchInvoice(
         lud16Link: Lnurl.getLud16LinkFromLud16(profile!.lud16!)!,
         amountSats: _amount!,
         zapRequest: zapRequest);

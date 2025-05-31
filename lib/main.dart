@@ -7,6 +7,7 @@ import 'package:freeflow/screens/create.dart';
 import 'package:freeflow/screens/create_preview.dart';
 import 'package:freeflow/screens/layout.dart';
 import 'package:freeflow/screens/login.dart';
+import 'package:freeflow/screens/mirror.dart';
 import 'package:freeflow/screens/notifications.dart';
 import 'package:freeflow/screens/new_account.dart';
 import 'package:freeflow/screens/profile_screen.dart';
@@ -128,9 +129,11 @@ Future<void> main() async {
                         Video.fromEvent(state.extra as Nip01Event));
                   } else {
                     return RxFilter<Nip01Event>(
-                      filter: Filter(
-                        ids: [Nip19.decode(state.pathParameters["id"]!)],
-                      ),
+                      filters: [
+                        Filter(
+                          ids: [Nip19.decode(state.pathParameters["id"]!)],
+                        )
+                      ],
                       builder: (ctx, data) {
                         final ev = (data?.length ?? 0) > 0 ? data!.first : null;
                         if (ev != null) {
@@ -144,7 +147,9 @@ Future<void> main() async {
                     );
                   }
                 },
-              )
+              ),
+              GoRoute(
+                  path: "/mirror", builder: (context, state) => MirrorPage()),
             ]),
           ]),
     ]),

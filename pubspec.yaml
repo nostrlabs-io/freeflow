@@ -38,9 +38,24 @@ dependencies:
 dependency_overrides:
   ndk:
     git:
-      url: https://github.com/v0l/ndk
+      url: https://github.com/relaystr/ndk
       path: packages/ndk
-      ref: 875253bcd3ff67c3ed2798834ec42d5f18687cf9
+      ref: 00eee5460ca478a02ec9a91c0a6100f2e50eddce
+  ndk_objectbox:
+    git:
+      url: https://github.com/relaystr/ndk
+      path: packages/objectbox
+      ref: 00eee5460ca478a02ec9a91c0a6100f2e50eddce
+  ndk_amber:
+    git:
+      url: https://github.com/relaystr/ndk
+      path: packages/amber
+      ref: 00eee5460ca478a02ec9a91c0a6100f2e50eddce
+  ndk_rust_verifier:
+    git:
+      url: https://github.com/relaystr/ndk
+      path: packages/rust_verifier
+      ref: 00eee5460ca478a02ec9a91c0a6100f2e50eddce
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.3"

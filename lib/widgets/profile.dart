@@ -91,8 +91,9 @@ class ProfileWidget extends StatelessWidget {
                     Column(
                       children: [
                         RxFilter<Nip01Event>(
-                            filter:
-                                Filter(pTags: [profile.pubKey], kinds: [9735]),
+                            filters: [
+                              Filter(pTags: [profile.pubKey], kinds: [9735])
+                            ],
                             builder: (context, data) {
                               if (data == null) {
                                 return SizedBox(
@@ -153,8 +154,9 @@ class ProfileWidget extends StatelessWidget {
       case 0:
         {
           return RxFilter<Video>(
-            filter:
-                Filter(kinds: SHORT_KIND, authors: [profile.pubKey], limit: 50),
+            filters: [
+              Filter(kinds: SHORT_KIND, authors: [profile.pubKey], limit: 50)
+            ],
             mapper: (e) => Video.fromEvent(e),
             builder: (ctx, data) {
               data?.sort(
@@ -166,20 +168,24 @@ class ProfileWidget extends StatelessWidget {
       case 1:
         {
           return RxFilter<Nip01Event>(
-            filter: Filter(
-              kinds: [7],
-              tags: {"#k": SHORT_KIND.map((e) => e.toString()).toList()},
-              authors: [profile.pubKey],
-              limit: 50,
-            ),
+            filters: [
+              Filter(
+                kinds: [7],
+                tags: {"#k": SHORT_KIND.map((e) => e.toString()).toList()},
+                authors: [profile.pubKey],
+                limit: 50,
+              )
+            ],
             builder: (ctx, data) {
               if ((data?.length ?? 0) == 0) {
                 return SizedBox();
               }
               return RxFilter<Video>(
-                  filter: Filter(
-                    ids: data!.map((e) => e.getEId()).nonNulls.toList(),
-                  ),
+                  filters: [
+                    Filter(
+                      ids: data!.map((e) => e.getEId()).nonNulls.toList(),
+                    )
+                  ],
                   mapper: (e) => Video.fromEvent(e),
                   builder: (ctx, data) {
                     data?.sort((a, b) =>
@@ -237,7 +243,9 @@ class ProfileWidget extends StatelessWidget {
       Column(
         children: [
           RxFilter<Nip01Event>(
-              filter: Filter(pTags: [profile.pubKey], kinds: [3]),
+              filters: [
+                Filter(pTags: [profile.pubKey], kinds: [3])
+              ],
               builder: (context, data) {
                 if (data == null) {
                   return SizedBox(

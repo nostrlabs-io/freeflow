@@ -100,7 +100,9 @@ class ActionsToolbar extends StatelessWidget {
       String? title,
       void Function(bool)? onPressed}) {
     return RxFilter<Nip01Event>(
-      filter: Filter(kinds: [kind], eTags: [video.id]),
+      filters: [
+        Filter(kinds: [kind], eTags: [video.id])
+      ],
       builder: (ctx, data) {
         final hasMyReaction = data?.any((e) {
               if (e.kind != 9735) {

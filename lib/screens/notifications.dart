@@ -56,12 +56,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             Expanded(
               child: SingleChildScrollView(
                 child: RxFilter<Nip01Event>(
-                  filter: Filter(
-                    pTags: [ndk.accounts.getPublicKey() ?? ""],
-                    tags: {"#k": SHORT_KIND.map((v) => v.toString()).toList()},
-                    kinds: [1111, 9735, 7],
-                    limit: 20,
-                  ),
+                  filters: [
+                    Filter(
+                      pTags: [ndk.accounts.getPublicKey() ?? ""],
+                      tags: {
+                        "#k": SHORT_KIND.map((v) => v.toString()).toList()
+                      },
+                      kinds: [1111, 9735, 7],
+                      limit: 20,
+                    )
+                  ],
                   builder: (ctx, data) {
                     if (data == null) {
                       return _placeholder();
@@ -146,7 +150,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   Widget _eventName(String eventId) {
     return RxFilter<Nip01Event>(
-      filter: Filter(ids: [eventId]),
+      filters: [
+        Filter(ids: [eventId])
+      ],
       builder: (ctx, data) {
         if (data?.isEmpty ?? true) return SizedBox.shrink();
 
@@ -191,7 +197,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     if (eTag == null) return null;
 
     return RxFilter<Nip01Event>(
-      filter: Filter(ids: [eTag]),
+      filters: [
+        Filter(ids: [eTag])
+      ],
       builder: (ctx, data) {
         if (data?.isEmpty ?? true) return SizedBox.shrink();
 

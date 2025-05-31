@@ -65,7 +65,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   child: RxFilter<Nip01Event>(
                     key: Key("search-${_searchFilter.hashCode}"),
                     relays: SEARCH_RELAYS,
-                    filter: _searchFilter!,
+                    filters: [_searchFilter!],
                     builder: (ctx, data) {
                       final shorts =
                           data?.where((e) => SHORT_KIND.contains(e.kind));
