@@ -16,7 +16,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter_version: 3.32.0
+          flutter-version: 3.32.0
       - run: flutter pub get
       - name: Build apk
         env:
