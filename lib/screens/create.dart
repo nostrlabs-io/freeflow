@@ -117,7 +117,7 @@ class _CreateShortScreen extends State<CreateShortScreen> {
                               IconButton.filled(
                                 color: Color.fromARGB(255, 255, 255, 255),
                                 onPressed: () => context.push("/mirror"),
-                                icon: Icon(Icons.content_copy_sharp),
+                                icon: Icon(Icons.file_copy),
                               ),
                             ]),
                             Row(
