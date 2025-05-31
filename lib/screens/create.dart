@@ -45,8 +45,9 @@ class _CreateShortScreen extends State<CreateShortScreen> {
 
   @override
   void dispose() {
-    super.dispose();
+    controller?.dispose();
     WakelockPlus.disable();
+    super.dispose();
   }
 
   void _cycleCamera() {
@@ -116,7 +117,7 @@ class _CreateShortScreen extends State<CreateShortScreen> {
                               ),
                               IconButton.filled(
                                 color: Color.fromARGB(255, 255, 255, 255),
-                                onPressed: () => context.push("/mirror"),
+                                onPressed: () => context.go("/mirror"),
                                 icon: Icon(Icons.file_copy),
                               ),
                             ]),
