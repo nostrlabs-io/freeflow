@@ -75,19 +75,20 @@ class ActionsToolbar extends StatelessWidget {
                     constraints: BoxConstraints.expand(),
                     builder: (context) => CommentsWidget(video: video));
               }),
-          _getSocialAction(
-              icon: "zap",
-              activeColor: Colors.red,
-              kind: 9735,
-              onPressed: (_) {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (context) => ZapWidget(
-                    pubkey: video.user,
-                    target: video.event,
-                  ),
-                );
-              })
+          if (user.lud16 != null)
+            _getSocialAction(
+                icon: "zap",
+                activeColor: Colors.red,
+                kind: 9735,
+                onPressed: (_) {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) => ZapWidget(
+                      pubkey: video.user,
+                      target: video.event,
+                    ),
+                  );
+                })
         ],
       ),
     );
