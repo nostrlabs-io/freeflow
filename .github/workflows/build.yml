@@ -14,13 +14,6 @@ jobs:
           channel: stable
           flutter-version: 3.35.1
       - run: flutter pub get
-      - run: flutter build appbundle
-        env:
-          KEYSTORE: ${{ secrets.KEYSTORE }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          KEYSTORE_SHA256: ${{ secrets.KEYSTORE_SHA256 }}
       - run: flutter build apk --split-per-abi
         env:
           KEYSTORE: ${{ secrets.KEYSTORE }}
@@ -28,10 +21,6 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           KEYSTORE_SHA256: ${{ secrets.KEYSTORE_SHA256 }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: "release.aab"
-          path: "build/app/outputs/bundle/release/app-release.aab"
       - uses: actions/upload-artifact@v4
         with:
           name: "app-arm64-v8a-release.apk"
