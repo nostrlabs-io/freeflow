@@ -147,15 +147,7 @@ class _CreateShortScreen extends State<CreateShortScreen> {
                   ),
                   builder: (ctx, data, child) {
                     return Stack(
-                      children: [
-                        RotatedBox(
-                          quarterTurns:
-                              ((current_camera?.sensorOrientation ?? 0) / 90)
-                                  .floor(),
-                          child: controller!.buildPreview(),
-                        ),
-                        child!
-                      ],
+                      children: [controller!.buildPreview(), child!],
                     );
                   },
                 ),
