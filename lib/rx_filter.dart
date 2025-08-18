@@ -16,14 +16,14 @@ class RxFilter<T> extends StatefulWidget {
   final T Function(Nip01Event)? mapper;
   final List<String>? relays;
 
-  const RxFilter({
-    super.key,
+  const RxFilter(
+    Key? key, {
     required this.filters,
     this.leaveOpen = false,
     required this.builder,
     this.mapper,
     this.relays,
-  });
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _RxFilter<T>();
@@ -40,24 +40,6 @@ class _RxFilter<T> extends State<RxFilter<T>> {
       mapper: widget.mapper,
       relays: widget.relays,
     );
-    /* send spam into chat
-    if (widget.key is ValueKey) {
-      final vk = (widget.key as ValueKey).value as String;
-      if (vk.startsWith("stream:chat:")) {
-        Timer.periodic(Duration(seconds: 1), (_) {
-          final spam = Nip01Event(
-            pubKey:
-                "63fe6318dc58583cfe16810f86dd09e18bfd76aabc24a0081ce2856f330504ed",
-            kind: 1311,
-            tags: [
-              ["a", vk.split(":").last],
-            ],
-            content: "SPAM ${DateTime.now()}",
-          );
-          _state.insertEvent(spam);
-        });
-      }
-    }*/
     super.initState();
   }
 
@@ -173,14 +155,14 @@ class RxFutureFilter<T> extends StatelessWidget {
   final Widget? loadingWidget;
   final T Function(Nip01Event)? mapper;
 
-  const RxFutureFilter({
-    super.key,
+  const RxFutureFilter(
+    Key key, {
     required this.filterBuilder,
     required this.builder,
     this.mapper,
     this.leaveOpen = true,
     this.loadingWidget,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -189,7 +171,7 @@ class RxFutureFilter<T> extends StatelessWidget {
       builder: (ctx, data) {
         if (data.hasData) {
           return RxFilter<T>(
-            key: super.key,
+            super.key,
             filters: data.data!,
             mapper: mapper,
             builder: builder,

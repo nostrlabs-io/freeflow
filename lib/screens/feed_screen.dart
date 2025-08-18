@@ -6,7 +6,6 @@ import 'package:freeflow/main.dart';
 import 'package:freeflow/rx_filter.dart';
 import 'package:freeflow/widgets/profile.dart';
 import 'package:freeflow/widgets/short_video.dart';
-import 'package:freeflow/widgets/short_video_placeholder.dart';
 import 'package:ndk/ndk.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -60,13 +59,18 @@ class _FeedScreenState extends State<FeedScreen> {
       if (existing != null) {
         return existing;
       } else {
-        developer.log("PLAYER: loading ${vid.url}");
-        final c = VideoPlayerController.networkUrl(Uri.parse(vid.url!));
-        _contollers[vid.url!] = c;
-        await c.initialize();
-        await c.setLooping(true);
-        await c.play();
-        return c;
+        try {
+          developer.log("PLAYER: loading ${vid.url}");
+          final c = VideoPlayerController.networkUrl(Uri.parse(vid.url!));
+          await c.initialize();
+          _contollers[vid.url!] = c;
+          await c.setLooping(true);
+          await c.play();
+          
+          return c;
+        } catch (e) {
+          developer.log("Failed to load player: ${e}");
+        }
       }
     }
     return null;
@@ -74,6 +78,7 @@ class _FeedScreenState extends State<FeedScreen> {
 
   Widget build(BuildContext context) {
     return RxFutureFilter<Video>(
+      Key("feed:main"),
       leaveOpen: false,
       mapper: (e) => Video.fromEvent(e),
       filterBuilder: widget.feedBuilder,
@@ -97,42 +102,38 @@ class _FeedScreenState extends State<FeedScreen> {
             return FutureBuilder(
               future: _loadVideo(vid),
               builder: (ctx, data) {
-                if (data.data == null) {
-                  return ShortVideoPlaceholder(vid);
-                } else {
-                  final controller = data.data!;
-                  return PageView.builder(
-                    itemCount: 2,
-                    onPageChanged: (idx) {
-                      if (idx != 0) {
-                        controller.pause();
-                      } else {
-                        controller.play();
-                      }
-                    },
-                    itemBuilder: (context, index) {
-                      if (index == 0) {
-                        return ShortVideoPlayer(
-                          vid,
-                          controller: controller,
-                        );
-                      } else {
-                        return FutureBuilder(
-                          key: Key("profile-card:${vid.user}"),
-                          future: ndk.metadata.loadMetadata(vid.user),
-                          builder: (ctx, data) {
-                            return SafeArea(
-                              child: ProfileWidget(
-                                profile:
-                                    data.data ?? Metadata(pubKey: vid.user),
-                              ),
-                            );
-                          },
-                        );
-                      }
-                    },
-                  );
-                }
+                final controller = data.data;
+                return PageView.builder(
+                  itemCount: 2,
+                  onPageChanged: (idx) {
+                    if (idx != 0) {
+                      controller?.pause();
+                    } else {
+                      controller?.play();
+                    }
+                  },
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return ShortVideoPlayer(
+                        vid,
+                        controller: controller,
+                        willHaveController: true,
+                      );
+                    } else {
+                      return FutureBuilder(
+                        key: Key("profile-card:${vid.user}"),
+                        future: ndk.metadata.loadMetadata(vid.user),
+                        builder: (ctx, data) {
+                          return SafeArea(
+                            child: ProfileWidget(
+                              profile: data.data ?? Metadata(pubKey: vid.user),
+                            ),
+                          );
+                        },
+                      );
+                    }
+                  },
+                );
               },
             );
           },

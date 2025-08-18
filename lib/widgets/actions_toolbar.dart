@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/rx_filter.dart';
+import 'package:freeflow/utils.dart';
 import 'package:freeflow/widgets/avatar.dart';
 import 'package:freeflow/widgets/comments.dart';
 import 'package:freeflow/widgets/follow_button.dart';
@@ -81,7 +82,6 @@ class ActionsToolbar extends StatelessWidget {
               onPressed: (_) {
                 showModalBottomSheet(
                   context: context,
-                  constraints: BoxConstraints.expand(),
                   builder: (context) => ZapWidget(
                     pubkey: video.user,
                     target: video.event,
@@ -100,6 +100,7 @@ class ActionsToolbar extends StatelessWidget {
       String? title,
       void Function(bool)? onPressed}) {
     return RxFilter<Nip01Event>(
+      Key("social-actions:${kind}"),
       filters: [
         Filter(kinds: [kind], eTags: [video.id])
       ],

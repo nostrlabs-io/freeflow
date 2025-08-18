@@ -16,6 +16,30 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreen extends State<LoginScreen> {
   final _key = TextEditingController();
 
+  List<Widget> orSpacer() {
+    return [
+      SizedBox(
+        height: 20,
+      ),
+      Row(spacing: 20, children: [
+        Text(
+          "OR",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Expanded(
+            child: Container(
+          decoration: BoxDecoration(
+              border: Border(
+                  bottom: BorderSide(
+                      width: 1, color: Color.fromARGB(50, 0, 0, 0)))),
+        ))
+      ]),
+      SizedBox(
+        height: 20,
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -58,35 +82,16 @@ class _LoginScreen extends State<LoginScreen> {
                   child: BasicButton.text(
                     "Login",
                     fontSize: 16,
-                    onTap: () {
+                    onTap: (ctx) {
                       final keyData = Nip19.decode(_key.text);
                       if (keyData.length > 0) {
-                        LOGIN.value = Account.nip19(_key.text);
-                        context.go("/");
+                        LOGIN.value = LoginAccount.nip19(_key.text);
+                        ctx.go("/");
                       }
                     },
                   ),
                 ),
               ]),
-              SizedBox(
-                height: 20,
-              ),
-              Row(spacing: 20, children: [
-                Text(
-                  "OR",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Expanded(
-                    child: Container(
-                  decoration: BoxDecoration(
-                      border: Border(
-                          bottom: BorderSide(
-                              width: 1, color: Color.fromARGB(50, 0, 0, 0)))),
-                ))
-              ]),
-              SizedBox(
-                height: 20,
-              ),
               FutureBuilder(future: (() async {
                 final amber = Amberflutter();
                 if (Platform.isAndroid && await amber.isAppInstalled()) {
@@ -96,54 +101,45 @@ class _LoginScreen extends State<LoginScreen> {
                 }
               })(), builder: (ctx, state) {
                 if (state.data ?? false) {
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: BasicButton.text(
-                          "Login with Android Signer",
-                          fontSize: 16,
-                          onTap: () async {
-                            final amber = Amberflutter();
-                            final result = await amber.getPublicKey();
-                            if (result['signature'] != null) {
-                              final key = Nip19.decode(result['signature']);
-                              LOGIN.value = Account.externalPublicKeyHex(key);
-                              context.go("/");
-                            }
-                          },
+                  return Column(
+                      spacing: 10,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ...orSpacer(),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: BasicButton.text(
+                                "Login with Android Signer",
+                                fontSize: 16,
+                                onTap: (ctx) async {
+                                  final amber = Amberflutter();
+                                  final result = await amber.getPublicKey();
+                                  if (result['signature'] != null) {
+                                    final key =
+                                        Nip19.decode(result['signature']);
+                                    LOGIN.value =
+                                        LoginAccount.externalPublicKeyHex(key);
+                                    ctx.go("/");
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  );
+                      ]);
                 } else {
                   return SizedBox.shrink();
                 }
               }),
-              SizedBox(
-                height: 20,
-              ),
-              Row(spacing: 20, children: [
-                Text(
-                  "OR",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Expanded(
-                    child: Container(
-                  decoration: BoxDecoration(
-                      border: Border(
-                          bottom: BorderSide(
-                              width: 1, color: Color.fromARGB(50, 0, 0, 0)))),
-                ))
-              ]),
-              SizedBox(
-                height: 20,
-              ),
+              ...orSpacer(),
               Row(children: [
                 Expanded(
                     child: BasicButton.text(
                   "Create Account",
                   fontSize: 16,
-                  onTap: () => context.push("./new"),
+                  onTap: (ctx) => ctx.push("/login/new"),
                 ))
               ]),
             ],

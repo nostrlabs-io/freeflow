@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/screens/create.dart';
 import 'package:freeflow/widgets/button.dart';
+import 'package:freeflow/widgets/error.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ndk/ndk.dart';
 import 'package:ndk/shared/nips/nip19/nip19.dart';
@@ -95,19 +96,8 @@ class _CreatePreview extends State<CreatePreview> {
                 spacing: 10,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  ...(_error != null
-                      ? [
-                          Text(
-                            _error!,
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Color.fromARGB(255, 255, 0, 0),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        ]
-                      : []),
-                  BasicButton.text("Post", onTap: () {
+                  ...(_error != null ? [ErrorText(_error!)] : []),
+                  BasicButton.text("Post", onTap: (context) {
                     if (_description.text.length > 4 && _finalFile != null) {
                       _postShort(_description.text, _finalFile!, _videoServer)
                           .then((e) {

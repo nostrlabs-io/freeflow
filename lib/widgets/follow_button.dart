@@ -25,6 +25,7 @@ class _FollowButtonWidget extends State<FollowButtonWidget> {
     final myPubkey = ndk.accounts.getPublicKey();
     if (myPubkey != null && myPubkey != widget.pubkey) {
       return RxFilter<List<String>>(
+        Key("follow-button"),
         filters: [
           Filter(authors: [myPubkey], kinds: [3])
         ],

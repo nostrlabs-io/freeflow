@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:freeflow/imgproxy.dart';
-import 'package:freeflow/widgets/profile_loader.dart';
+import 'package:freeflow/widgets/profile_name.dart';
 import 'package:ndk/ndk.dart';
 
 class AvatarWidget extends StatelessWidget {

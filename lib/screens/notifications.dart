@@ -5,6 +5,7 @@ import 'package:freeflow/data/video.dart';
 import 'package:freeflow/imgproxy.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/rx_filter.dart';
+import 'package:freeflow/utils.dart';
 import 'package:freeflow/widgets/avatar.dart';
 import 'package:freeflow/widgets/profile_name.dart';
 import 'package:go_router/go_router.dart';
@@ -56,6 +57,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             Expanded(
               child: SingleChildScrollView(
                 child: RxFilter<Nip01Event>(
+                  Key("notifications"),
                   filters: [
                     Filter(
                       pTags: [ndk.accounts.getPublicKey() ?? ""],
@@ -150,6 +152,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   Widget _eventName(String eventId) {
     return RxFilter<Nip01Event>(
+      Key("notifications:event:${eventId}"),
       filters: [
         Filter(ids: [eventId])
       ],
@@ -197,6 +200,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     if (eTag == null) return null;
 
     return RxFilter<Nip01Event>(
+      Key("notifications:${eTag}"),
       filters: [
         Filter(ids: [eTag])
       ],

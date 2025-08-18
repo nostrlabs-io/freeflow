@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/view_model/login.dart';
 import 'package:freeflow/widgets/button.dart';
+import 'package:freeflow/widgets/error.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ndk/domain_layer/entities/metadata.dart';
@@ -54,9 +55,9 @@ class _NewAccountScreen extends State<NewAccountScreen> {
                 labelText: "Username",
               ),
             ),
-            BasicButton.text("Login", onTap: () {
+            BasicButton.text("Login", onTap: (context) {
               _login().then((_) {
-                LOGIN.value = Account.privateKeyHex(_privateKey.privateKey!);
+                LOGIN.value = LoginAccount.privateKeyHex(_privateKey.privateKey!);
                 context.go("/");
               }).catchError((e) {
                 setState(() {
@@ -66,7 +67,7 @@ class _NewAccountScreen extends State<NewAccountScreen> {
                 });
               });
             }),
-            if (_error != null) Text(_error!),
+            if (_error != null) ErrorText(_error!),
           ],
         ),
       ),

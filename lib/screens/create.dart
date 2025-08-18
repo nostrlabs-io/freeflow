@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:freeflow/widgets/button.dart';
+import 'package:freeflow/widgets/error.dart';
 import 'package:freeflow/widgets/record_button.dart';
 import 'package:freeflow/widgets/timer.dart';
 import 'package:go_router/go_router.dart';
@@ -40,6 +41,10 @@ class _CreateShortScreen extends State<CreateShortScreen> {
         cameras = c;
       });
       _cycleCamera();
+    }).catchError((e) {
+      setState(() {
+        _error = e.toString();
+      });
     });
   }
 
@@ -126,8 +131,9 @@ class _CreateShortScreen extends State<CreateShortScreen> {
                               children: [
                                 BasicButton.text(
                                   "Next",
-                                  onTap: () => context.push("/create/preview",
-                                      extra: clips),
+                                  onTap: (ctx) {
+                                    ctx.push("/create/preview", extra: clips);
+                                  },
                                   fontSize: 16,
                                   margin: EdgeInsets.only(right: 5),
                                 ),
@@ -154,7 +160,9 @@ class _CreateShortScreen extends State<CreateShortScreen> {
                   },
                 ),
               )
-            : null,
+            : _error != null
+                ? Center(child: ErrorText(_error!))
+                : null,
       ),
     );
   }

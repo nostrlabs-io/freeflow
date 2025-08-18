@@ -28,6 +28,7 @@ class _CommentsWidget extends State<CommentsWidget> {
     return Container(
       padding: EdgeInsets.all(10),
       child: RxFilter<Nip01Event>(
+        Key("comments"),
         filters: [
           Filter(kinds: [1111], eTags: [widget.video.id])
         ],
@@ -57,7 +58,7 @@ class _CommentsWidget extends State<CommentsWidget> {
                         ),
                       ),
                     ),
-                    BasicButton.text("Send", onTap: () async {
+                    BasicButton.text("Send", onTap: (context) async {
                       await _postComment();
                       setState(() {
                         _comment.clear();

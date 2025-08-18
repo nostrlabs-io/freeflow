@@ -3,7 +3,6 @@ import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/rx_filter.dart';
 import 'package:freeflow/widgets/avatar.dart';
-import 'package:freeflow/widgets/profile_loader.dart';
 import 'package:freeflow/widgets/profile_name.dart';
 import 'package:freeflow/widgets/video_grid.dart';
 import 'package:go_router/go_router.dart';
@@ -63,7 +62,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: SingleChildScrollView(
                   padding: EdgeInsets.all(5),
                   child: RxFilter<Nip01Event>(
-                    key: Key("search-${_searchFilter.hashCode}"),
+                    Key("search-${_searchFilter.hashCode}"),
                     relays: SEARCH_RELAYS,
                     filters: [_searchFilter!],
                     builder: (ctx, data) {

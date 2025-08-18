@@ -128,10 +128,12 @@ Future<void> main() async {
                     return ShortVideoPlayer(
                         Video.fromEvent(state.extra as Nip01Event));
                   } else {
+                    final id = state.pathParameters["id"]!;
                     return RxFilter<Nip01Event>(
+                      Key("event:${id}"),
                       filters: [
                         Filter(
-                          ids: [Nip19.decode(state.pathParameters["id"]!)],
+                          ids: [Nip19.decode(id)],
                         )
                       ],
                       builder: (ctx, data) {
@@ -154,21 +156,4 @@ Future<void> main() async {
           ]),
     ]),
   ));
-}
-
-String formatSats(int n) {
-  if (n >= 1000000) {
-    return (n / 1000000).toStringAsFixed(1) + "M";
-  } else if (n >= 1000) {
-    return (n / 1000).toStringAsFixed(1) + "k";
-  } else {
-    return "${n}";
-  }
-}
-
-String zapSum(List<Nip01Event> zaps) {
-  final total = zaps
-      .map((e) => ZapReceipt.fromEvent(e))
-      .fold(0, (acc, v) => acc + (v.amountSats ?? 0));
-  return formatSats(total);
 }

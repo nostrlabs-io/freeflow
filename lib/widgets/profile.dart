@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:freeflow/data/video.dart';
 import 'package:freeflow/main.dart';
 import 'package:freeflow/rx_filter.dart';
+import 'package:freeflow/utils.dart';
 import 'package:freeflow/widgets/avatar.dart';
 import 'package:freeflow/widgets/follow_button.dart';
 import 'package:freeflow/widgets/profile_name.dart';
@@ -90,24 +91,22 @@ class ProfileWidget extends StatelessWidget {
                     ),
                     Column(
                       children: [
-                        RxFilter<Nip01Event>(
-                            filters: [
-                              Filter(pTags: [profile.pubKey], kinds: [9735])
-                            ],
-                            builder: (context, data) {
-                              if (data == null) {
-                                return SizedBox(
-                                  width: 29,
-                                  height: 29,
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-                              return Text(
-                                zapSum(data),
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
-                              );
-                            }),
+                        RxFilter<Nip01Event>(Key("profile:zaps"), filters: [
+                          Filter(pTags: [profile.pubKey], kinds: [9735])
+                        ], builder: (context, data) {
+                          if (data == null) {
+                            return SizedBox(
+                              width: 29,
+                              height: 29,
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          return Text(
+                            zapSum(data),
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          );
+                        }),
                         SizedBox(
                           height: 5,
                         ),
@@ -154,6 +153,7 @@ class ProfileWidget extends StatelessWidget {
       case 0:
         {
           return RxFilter<Video>(
+            Key("profile:shorts"),
             filters: [
               Filter(kinds: SHORT_KIND, authors: [profile.pubKey], limit: 50)
             ],
@@ -168,6 +168,7 @@ class ProfileWidget extends StatelessWidget {
       case 1:
         {
           return RxFilter<Nip01Event>(
+            Key("profile:reactions"),
             filters: [
               Filter(
                 kinds: [7],
@@ -180,7 +181,7 @@ class ProfileWidget extends StatelessWidget {
               if ((data?.length ?? 0) == 0) {
                 return SizedBox();
               }
-              return RxFilter<Video>(
+              return RxFilter<Video>(Key("profile:reactions:content"),
                   filters: [
                     Filter(
                       ids: data!.map((e) => e.getEId()).nonNulls.toList(),
@@ -242,23 +243,21 @@ class ProfileWidget extends StatelessWidget {
       ),
       Column(
         children: [
-          RxFilter<Nip01Event>(
-              filters: [
-                Filter(pTags: [profile.pubKey], kinds: [3])
-              ],
-              builder: (context, data) {
-                if (data == null) {
-                  return SizedBox(
-                    width: 29,
-                    height: 29,
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                return Text(
-                  formatSats(data.length),
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                );
-              }),
+          RxFilter<Nip01Event>(Key("profile:followers"), filters: [
+            Filter(pTags: [profile.pubKey], kinds: [3])
+          ], builder: (context, data) {
+            if (data == null) {
+              return SizedBox(
+                width: 29,
+                height: 29,
+                child: CircularProgressIndicator(),
+              );
+            }
+            return Text(
+              formatSats(data.length),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            );
+          }),
           SizedBox(
             height: 5,
           ),
