@@ -35,6 +35,17 @@ jobs:
           restore-keys: |
             gradle-${{ runner.os }}-
       - run: flutter pub get
+      - run: flutter build appbundle
+        env:
+          KEYSTORE: ${{ secrets.KEYSTORE }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEYSTORE_SHA256: ${{ secrets.KEYSTORE_SHA256 }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "release.aab"
+          path: "build/app/outputs/bundle/release/app-release.aab"
       - run: flutter build apk --split-per-abi
         env:
           KEYSTORE: ${{ secrets.KEYSTORE }}
