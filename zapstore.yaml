@@ -1,0 +1,15 @@
+repository: https://github.com/nostrlabs-io/freeflow
+match: ".*-arm64-v8a-release\\.apk$"
+name: Freeflow
+summary: Live in the moment
+description: |
+  Short videos on nostr. Live in the moment.
+tags:
+  - shorts
+  - video
+  - nostr
+license: MIT
+website: https://freeflow.app
+icon: https://nostr.download/b7f6bd1e3951185e49a04f733de61d1658b710645a40a875d5d18fdbcadf85cd.webp
+images:
+  - https://nostr.download/b6120e8aff11395bca8e51d720e9f4af636ed240dfe04d3b32f5f89cb5966eab.webp
